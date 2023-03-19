@@ -1,37 +1,25 @@
-## Welcome to GitHub Pages
+# 캡스톤디자인 41팀 소개 페이지
 
-You can use the [editor on GitHub](https://github.com/kookmin-sw/cap-template/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+<!-- 이미지 -->
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 1. 프로젝트 소개
+### 휠체어 사용자를 위한 실내 내비게이션
 
-### Markdown
+휠체어 사용자들이 지나다닐 수 있는 길은 한정적입니다. 또한 휠체어 사용자들이 이용할 수 있는 시설 또한 한정적입니다.
+다행히도 지금의 실외 지도 앱, 내비게이션 앱들은 거리뷰를 통해 길에 대한 구체적인 정보를 미리 확인할 수 있습니다.
+하지만 지금의 실내 지도 앱, 내비게이션 앱들은 실내 사진 뿐만 아니라 언덕, 턱, 길의 너비등의 정보를 제공하지 않습니다.
+결국 휠체어 사용자들은 직접 겪어보지 않으면 실내 장소에 어떠한 위험요소가 존재하는지에 대해 미리 알 수 없다는 것입니다.
+이러한 문제 의식을 통해 이 프로젝트는 휠체어 사용자가 실내에 대한 정보를 미리 파악하고, 위험요소를 사전에 차단하여 안전하게 실내에서 길을 찾을 수 있도록 도와주는 어플을 기획하게 되었습니다.
+**QR코드를 통한 현재 위치 파악 서비스와 현재 위치에서 휠체어 사용자들이 목적지까지 보다 안전하게 도착할 수 있도록 길을 안내하는 내비게이션 서비스를 구현하고자 합니다. 또한 사용자의 니즈를 분석하여 휠체어 사용자들이 자주 이용하고, 이용하기 전 사전 정보가 필요한 시설들에 대한 정보를 제공하는 서비스 또한 구현하고자 합니다.**
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+## 2. 주요 기능
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
+## 3. 시연 동영상
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
+## 4. 소개 자료
 
-[Link](url) and ![Image](src)
-```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/kookmin-sw/cap-template/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+## 5. 팀 소개
