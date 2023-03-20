@@ -14,65 +14,17 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 
-// https://www.youtube.com/watch?v=wfucGSKngq4
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    Button scanBtn;
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scanBtn = findViewById(R.id.scanBtn);
-        scanBtn.setOnClickListener(this);
+        Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+        startActivity(intent);
+
     }
 
-    @Override
-    public void onClick(View view) {
-        scanCode();
-    }
 
-    private void scanCode() {
-        IntentIntegrator integrator = new IntentIntegrator (this);
-        integrator.setCaptureActivity(CaptureAct.class);
-        integrator.setOrientationLocked(false);  //
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrator.setPrompt("Scanning Code");
-
-        // change to front-camera
-        integrator.setCameraId(1);
-
-        integrator.initiateScan();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() != null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(result.getContents());
-                builder.setTitle("Scanning Result");
-                builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        scanCode();
-                    }
-                }).setNegativeButton("finish", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-            else {
-                Toast.makeText(this, "No Results", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
 }
