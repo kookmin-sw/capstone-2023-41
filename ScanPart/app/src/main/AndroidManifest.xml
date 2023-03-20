@@ -30,6 +30,8 @@
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
             android:windowSoftInputMode="stateAlwaysHidden"></activity>
+        <activity android:name=".ScanActivity"
+            tools:ignore="Instantiatable"></activity>
     </application>
 
 </manifest>
