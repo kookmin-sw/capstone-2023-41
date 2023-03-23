@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "ScannerExample"
+rootProject.name = "Capstone_kotlin"
 include ':app'
