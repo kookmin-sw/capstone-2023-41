@@ -25,10 +25,10 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
     private fun scanCode() {
 
         val integrator = IntentIntegrator(this)
-        //integrator.captureActivity = CaptureActivity::class.java
-        integrator.setOrientationLocked(false) //
+        //integrator.captureActivity = scan::class.java
+        integrator.setOrientationLocked(false)
         integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
-        integrator.setPrompt("Scanning Code")
+        integrator.setPrompt("주변의 QR코드를 스캔해주세요.")
 
         // change to front-camera
         integrator.setCameraId(1)
@@ -39,6 +39,14 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents != null) {
+                //val intent : Intent = Intent(this@InputActivity, ResultActivity::class.java);
+                val intent : Intent = Intent(this@ScanActivity, MainActivity::class.java);
+                intent.putExtra("QRdata", result.contents)
+
+                //ResultActivity 내에서 ...
+                //Intent intent = getIntent();
+                //String myData = intent.getStringExtra("QRdata");
+
                 val builder = AlertDialog.Builder(this)
                 builder.setMessage(result.contents)
                 builder.setTitle("Scanning Result")
