@@ -1,6 +1,6 @@
 # 캡스톤디자인 41팀 소개 페이지
 
-<img src=".docs/img/Logo.PNG" alt="로고" width="400" />
+<img src="./docs/img/Logo.PNG" alt="로고" width="400" />
 
 ## 1. 프로젝트 소개
 ### 휠체어 사용자를 위한 실내 내비게이션
