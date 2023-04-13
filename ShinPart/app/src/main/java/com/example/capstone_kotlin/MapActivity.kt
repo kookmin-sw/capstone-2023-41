@@ -17,6 +17,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 class MapActivity : AppCompatActivity() {
     var imageView: SubsamplingScaleImageView? = null
     var gestureDetector: GestureDetector? = null
+    val array = arrayOf(100, 100)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
@@ -27,8 +28,7 @@ class MapActivity : AppCompatActivity() {
         gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 val sCoord = imageView?.viewToSourceCoord(e.x, e.y)
-                val msg = "x:" + sCoord!!.x + "y:" + sCoord.y
-                Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
+                check_area(sCoord!!.x, sCoord.y)
                 return true
             }
         })
@@ -37,5 +37,14 @@ class MapActivity : AppCompatActivity() {
                 motionEvent
             )
         })
+    }
+
+    private fun check_area(x: Float, y: Float)
+    {
+        if (x < array[0] && y<array[1])
+        {
+            val msg = "x:" + x + "y:" + y
+            Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
+        }
     }
 }
