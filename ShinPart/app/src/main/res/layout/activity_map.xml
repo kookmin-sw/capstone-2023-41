@@ -11,8 +11,8 @@
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/imageView"
-        android:layout_width="266dp"
-        android:layout_height="349dp"
+        android:layout_width="386dp"
+        android:layout_height="414dp"
         android:layout_marginTop="10dp"
         app:src="@drawable/duck" />
 

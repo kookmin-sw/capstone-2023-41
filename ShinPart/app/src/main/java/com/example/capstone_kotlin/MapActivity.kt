@@ -1,8 +1,8 @@
 package com.example.capstone_kotlin
 
-import android.content.Context
+import android.R.id
+import android.net.Uri
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
+
 class MapActivity : AppCompatActivity() {
     var imageView: SubsamplingScaleImageView? = null
     var gestureDetector: GestureDetector? = null
@@ -20,8 +21,8 @@ class MapActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
-        imageView = findViewById(R.id.imageView)
-        //imageView?.setImage(ImageSource.asset("map.png"))
+        imageView = findViewById<View>(R.id.imageView) as SubsamplingScaleImageView
+        imageView?.setImage(ImageSource.resource(R.drawable.map))
 
         gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
@@ -37,5 +38,4 @@ class MapActivity : AppCompatActivity() {
             )
         })
     }
-
 }
