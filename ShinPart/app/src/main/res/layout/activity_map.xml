@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".MapActivity"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     >
 
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+    <com.example.capstone_kotlin.PinView
         android:id="@+id/imageView"
         android:layout_width="386dp"
         android:layout_height="414dp"
