@@ -39,7 +39,6 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents != null) {
-                //val intent : Intent = Intent(this@InputActivity, ResultActivity::class.java);
                 val intent : Intent = Intent(this@ScanActivity, MainActivity::class.java);
                 intent.putExtra("QRdata", result.contents)
 
