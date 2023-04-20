@@ -31,7 +31,9 @@ class MainActivity : AppCompatActivity() {
             text += "${i.idx}, ${i.id}, ${i.x}, ${i.y}, ${i.x1}, ${i.y1}, ${i.x2}, ${i.y2}\n"
         }
 
-        text += "\nid = ${db.findID(920, 440, list1)}"
+        text += "\nid = ${db.findID(920, 440, list1)}\n"
+
+        text += "\nx = ${db.findXY(464, list1)?.first}, y = ${db.findXY(464, list1)?.second}"
 
         textView.text = text
     }

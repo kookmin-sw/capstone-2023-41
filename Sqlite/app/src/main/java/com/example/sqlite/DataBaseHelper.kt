@@ -111,6 +111,16 @@ class DataBaseHelper(private val context: Context) :
         return 0
     }
 
+    fun findXY(id: Int, list: List<PlaceNode>): Pair<Int, Int>? {
+        for (i in list) {
+            if (i.id == id) {
+                return Pair(i.x, i.y)
+            }
+        }
+
+        return null
+    }
+
     override fun onCreate(db: SQLiteDatabase) {}
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
