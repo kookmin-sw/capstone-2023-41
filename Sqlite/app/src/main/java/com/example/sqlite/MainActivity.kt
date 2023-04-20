@@ -22,20 +22,16 @@ class MainActivity : AppCompatActivity() {
         var text = "list1\n\n"
 
         for (i in list1) {
-            text += "${i.idx}, ${i.name}, ${i.x}, ${i.y}, ${i.x1}, ${i.y1}, ${i.x2}, ${i.y2}\n"
+            text += "${i.idx}, ${i.id}, ${i.name}, ${i.x}, ${i.y}, ${i.x1}, ${i.y1}, ${i.x2}, ${i.y2}\n"
         }
 
         text += "\nlist2\n\n"
 
         for (i in list2) {
-            text += "${i.idx}, ${i.x}, ${i.y}, ${i.x1}, ${i.y1}, ${i.x2}, ${i.y2}\n"
+            text += "${i.idx}, ${i.id}, ${i.x}, ${i.y}, ${i.x1}, ${i.y1}, ${i.x2}, ${i.y2}\n"
         }
 
-        for (i in list1) {
-            if ((i.x1 <= 920 && 920 <= i.x2) && (i.y1 <= 440 && 440 <= i.y2)) {
-                text += "\nindex = ${i.idx}"
-            }
-        }
+        text += "\nid = ${db.findID(920, 440, list1)}"
 
         textView.text = text
     }

@@ -54,8 +54,8 @@ class DataBaseHelper(private val context: Context) :
         }
     }
 
-    data class PlaceNode(val idx: Int, val name: String, val x: Int, val y: Int, val x1: Int, val y1: Int, val x2: Int, val y2: Int)
-    data class CrossNode(val idx: Int, val x: Int, val y: Int, val x1: Int, val y1: Int, val x2: Int, val y2: Int)
+    data class PlaceNode(val idx: Int, val id: Int, val name: String, val x: Int, val y: Int, val x1: Int, val y1: Int, val x2: Int, val y2: Int)
+    data class CrossNode(val idx: Int, val id: Int, val x: Int, val y: Int, val x1: Int, val y1: Int, val x2: Int, val y2: Int)
 
     val placeList = mutableListOf<PlaceNode>()
     val crossList = mutableListOf<CrossNode>()
@@ -67,11 +67,12 @@ class DataBaseHelper(private val context: Context) :
         nodesPlaceCursor?.let {
             while (it.moveToNext()) {
                 val idx = it.getInt(0)
-                val name = it.getString(1)
-                val x = it.getInt(2)
-                val y = it.getInt(3)
+                val id = it.getInt(1)
+                val name = it.getString(2)
+                val x = it.getInt(3)
+                val y = it.getInt(4)
 
-                placeList.add(PlaceNode(idx, name, x, y, x - 15, y - 15, x + 15, y + 15))
+                placeList.add(PlaceNode(idx, id, name, x, y, x - 15, y - 15, x + 15, y + 15))
             }
 
             it.close()
@@ -87,16 +88,27 @@ class DataBaseHelper(private val context: Context) :
         nodesCrossCursor?.let {
             while (it.moveToNext()) {
                 val idx = it.getInt(0)
-                val x = it.getInt(1)
-                val y = it.getInt(2)
+                val id = it.getInt(1)
+                val x = it.getInt(2)
+                val y = it.getInt(3)
 
-                crossList.add(CrossNode(idx, x, y, x - 15, y - 15, x + 15, y + 15))
+                crossList.add(CrossNode(idx, id, x, y, x - 15, y - 15, x + 15, y + 15))
             }
 
             it.close()
         }
 
         return crossList
+    }
+
+    fun findID(x: Int, y: Int, list: List<PlaceNode>): Int {
+        for (i in list) {
+            if ((i.x1 <= x && x <= i.x2) && (i.y1 <= y && y <= i.y2)) {
+                return i.id
+            }
+        }
+
+        return 0
     }
 
     override fun onCreate(db: SQLiteDatabase) {}
