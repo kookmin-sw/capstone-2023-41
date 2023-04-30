@@ -31,7 +31,7 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
         integrator.setPrompt("주변의 QR코드를 스캔해주세요.")
 
         // change to front-camera
-        integrator.setCameraId(1)
+        integrator.setCameraId(0)
         integrator.initiateScan()
     }
 
@@ -39,9 +39,9 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents != null) {
-                val intent : Intent = Intent(this@ScanActivity, MainActivity::class.java);
+                val intent : Intent = Intent(this, MapActivity::class.java);
                 intent.putExtra("QRdata", result.contents)
-
+                startActivity(intent)
                 //ResultActivity 내에서 ...
                 //Intent intent = getIntent();
                 //String myData = intent.getStringExtra("QRdata");
@@ -57,7 +57,7 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
                 val dialog = builder.create()
                 dialog.show()
             } else {
-                Toast.makeText(this, "No Results", Toast.LENGTH_LONG).show()
+                //Toast.makeText(this, "No Results", Toast.LENGTH_LONG).show()
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
