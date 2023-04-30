@@ -14,6 +14,8 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     private var pinArray = ArrayList<PointF>()
     private var fixedArray = ArrayList<Int>() // 0 : not fix, 1 : fix
     private var imageArray = ArrayList<Int>()
+    private var lineArray = ArrayList<PointF>()
+    private var lineColorArray = ArrayList<Int>()
     var w: Float? = null
     var h: Float? = null
 
@@ -48,6 +50,18 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     }
 
     /**
+     * 지도(기본 이미지)위에 표시할 Point를 추가합니다. 이 Point들은 2개 이상일 경우 연결되어 선을 표시합니다.
+     * @param point PointF 형식의 좌표입니다.
+     * @param color 표현될 선의 색깔입니다. 1번 좌표, 2번 좌표 를 추가했을때 1번 좌표와 함께 입력된 색깔이 선의 색깔이 됩니다.
+     */
+    fun addLine(point: PointF?, color: Int?)
+    {
+        lineArray.add(point!!)
+        lineColorArray.add(color!!)
+        invalidate()
+    }
+
+    /**
      * 지도(기본 이미지)위에 표시된 Pin을 모두 제거합니다.
      */
     fun clearPin()
@@ -55,20 +69,15 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         pinArray = arrayListOf()
         fixedArray = arrayListOf()
         imageArray = arrayListOf()
+        lineArray = arrayListOf()
+        lineColorArray = arrayListOf()
         invalidate()
     }
 
-    // init 부분에서 이 부분을 지우고 실행해봤는데 마커가 그려지지 않았음. 추후 해석 필.
-    private fun initialise() {
-        val density = resources.displayMetrics.densityDpi.toFloat()
-        iPin = BitmapFactory.decodeResource(this.resources, R.drawable.duck)
-        w = density / 420f * iPin!!.getWidth()
-        h = density / 420f * iPin!!.getHeight()
-        iPin = Bitmap.createScaledBitmap(iPin!!, w!!.toInt(), h!!.toInt(), true)
-    }
+    private fun initialise() {}
 
     /**
-     * 저장된 좌표들을 지도 위에 표시합니다.
+     * 저장된 좌표, 라인들을 지도 위에 표시합니다.
      */
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -78,36 +87,55 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
             return
         }
         paint.isAntiAlias = true
-        if (sPin != null && iPin != null) {
-            var s = scale
-            val density = resources.displayMetrics.densityDpi.toFloat()
-            for(i in pinArray.indices)
+
+        // Line 파트
+        val myPaint = Paint()
+        myPaint.strokeWidth = 10f
+        myPaint.style = Paint.Style.FILL
+        myPaint.isAntiAlias = true
+        myPaint.strokeCap = Paint.Cap.ROUND
+        for (i in 0..lineArray.size)
+        {
+            if (i >= lineArray.size-1)
             {
-                var pin = pinArray.get(i)
-                var fix = fixedArray.get(i)
-                var imageId = imageArray.get(i)
-                sourceToViewCoord(pin, vPin)
-                var image = BitmapFactory.decodeResource(this.resources, imageId)
-                w = density / 420f * image!!.getWidth()
-                h = density / 420f * image!!.getHeight()
-
-                if(fix == 1) // 확대 축소에 따라 크기가 변하지 않음
-                {
-                    image = Bitmap.createScaledBitmap(image!!, (w!!).toInt(), (h!!).toInt(), true)
-                }
-                else // 확대 축소에 따라 크기가 변함
-                {
-                    image= Bitmap.createScaledBitmap(image!!, (w!!*s).toInt(), (h!!*s).toInt(), true)
-                }
-                val vX = vPin.x - image!!.width / 2 //(해당 좌표기준 좌측 위로 이미지가 생성됨)
-                val vY = vPin.y - image!!.height
-                canvas.drawBitmap(image!!, vX, vY, paint)
+                break
             }
+            myPaint.color = lineColorArray.get(i)
+            var pointTmp1 = PointF()
+            var pointTmp2 = PointF()
+            sourceToViewCoord(lineArray.get(i), pointTmp1)
+            sourceToViewCoord(lineArray.get(i+1),pointTmp2)
+            canvas.drawLine(pointTmp1.x,pointTmp1.y,pointTmp2.x, pointTmp2.y, myPaint)
+        }
 
+        // Marker 파트
+        var s = scale
+        val density = resources.displayMetrics.densityDpi.toFloat()
+        for(i in pinArray.indices)
+        {
+            var pin = pinArray.get(i)
+            var fix = fixedArray.get(i)
+            var imageId = imageArray.get(i)
+            sourceToViewCoord(pin, vPin)
+            var image = BitmapFactory.decodeResource(this.resources, imageId)
+            w = density / 420f * image!!.getWidth()
+            h = density / 420f * image!!.getHeight()
+
+            if(fix == 1) // 확대 축소에 따라 크기가 변하지 않음
+            {
+                image = Bitmap.createScaledBitmap(image!!, (w!!).toInt(), (h!!).toInt(), true)
+            }
+            else // 확대 축소에 따라 크기가 변함
+            {
+                image= Bitmap.createScaledBitmap(image!!, (w!!*s).toInt(), (h!!*s).toInt(), true)
+            }
+            val vX = vPin.x - image!!.width / 2 //(/2가 없는 경우 해당 좌표기준 좌측 위로 이미지가 생성됨)
+            val vY = vPin.y - image!!.height
+            canvas.drawBitmap(image!!, vX, vY, paint)
         }
     }
 
     init {
-        initialise()
+        //initialise()
     }
 }
