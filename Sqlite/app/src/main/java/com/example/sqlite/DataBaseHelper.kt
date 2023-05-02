@@ -145,20 +145,20 @@ class DataBaseHelper(private val context: Context) :
         return crossList
     }
 
-    fun findID(x: Int, y: Int, list: List<PlaceNode>): Int {
+    fun findtoID(x: Int, y: Int, list: List<PlaceNode>): PlaceNode? {
         for (i in list) {
             if ((i.x1 <= x && x <= i.x2) && (i.y1<= y && y <= i.y2)) {
-                return i.id
+                return i
             }
         }
 
-        return 0
+        return null
     }
 
-    fun findXY(id: Int, list: List<PlaceNode>): Pair<Int, Int>? {
+    fun findtoXY(id: Int, list: List<PlaceNode>): PlaceNode? {
         for (i in list) {
             if (i.id == id) {
-                return Pair(i.x, i.y)
+                return i
             }
         }
 

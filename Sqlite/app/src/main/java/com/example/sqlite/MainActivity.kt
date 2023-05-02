@@ -35,9 +35,9 @@ class MainActivity : AppCompatActivity() {
             text += "${i.idx}, ${i.id}, ${i.x}, ${i.y}, ${i.nodes}\n"
         }
 
-        text += "\nid = ${db.findID(920, 440, nodesPlace)}\n"
+        text += "\nid = ${db.findtoID(920, 440, nodesPlace)?.id}\n"
 
-        text += "\nx = ${db.findXY(464, nodesPlace)?.first}, y = ${db.findXY(464, nodesPlace)?.second}"
+        text += "\nx = ${db.findtoXY(464, nodesPlace)?.x}, y = ${db.findtoXY(464, nodesPlace)?.y}"
 
         textView.text = text
 /*
