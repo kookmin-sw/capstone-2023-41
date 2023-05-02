@@ -25,12 +25,14 @@ fun dijkstra(graph: Array<ArrayList<Edge>>, start: Int, end: Int): Pair<Int, Lis
 
         // 도착 노드에 도달하면 현 최단거리 리턴하고 종료
         if (cur == end) {
-            val path2 = path.distinct().toMutableList()
-            for (i in path2.indices.reversed()){
-                if (path2[i] == -1){
-                    path2.removeAt(i)
-                }
+            val path2 = ArrayList<Int>()
+            path2.add(end)
+            while(true){
+                path2.add(path[path2.last()])
+                if(path2.last() == start)
+                    break
             }
+            path2.reverse()
             return curDist to path2
         }
 
@@ -53,12 +55,12 @@ fun dijkstra(graph: Array<ArrayList<Edge>>, start: Int, end: Int): Pair<Int, Lis
 
 fun main() {
     val graph = arrayOf(
-        arrayListOf(Edge(1, 5)),
-        arrayListOf(Edge(0,5), Edge(2,11), Edge(4,5)),
-        arrayListOf(Edge(1, 11),Edge(5, 6)),
-        arrayListOf(Edge(4,13)),
-        arrayListOf(Edge(1, 5), Edge(3, 13), Edge(5, 11)),
-        arrayListOf(Edge(2,6), Edge(4, 11), Edge(6,10)),
+        arrayListOf(Edge(2, 10)),
+        arrayListOf(Edge(3,13)),
+        arrayListOf(Edge(0,10), Edge(3,5), Edge(4,11)),
+        arrayListOf(Edge(1,13),Edge(2,5), Edge(5,11)),
+        arrayListOf(Edge(2,11),Edge(5,6)),
+        arrayListOf(Edge(3,11),Edge(4,6),Edge(6,10)),
         arrayListOf(Edge(5,10))
     )
     val start = 0
