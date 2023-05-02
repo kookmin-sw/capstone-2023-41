@@ -13,5 +13,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="20sp" />
+<!--
+    <ImageView
+        android:id="@+id/iv_img1"
+        android:layout_width="match_parent"
+        android:layout_height="260dp" />
 
+    <ImageView
+        android:id="@+id/iv_img2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+-->
 </LinearLayout>
