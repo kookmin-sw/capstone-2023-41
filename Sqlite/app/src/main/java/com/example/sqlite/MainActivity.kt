@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         var text = "list1\n\n"
 
         for (i in nodesPlace) {
-            text += "${i.idx}, ${i.id}, ${i.name}, ${i.x}, ${i.y}, ${i.x1}, ${i.y1}, ${i.x2}, ${i.y2}\n"
+            text += "${i.idx}, ${i.id}, ${i.name}, ${i.x}, ${i.y}, ${i.x1}, ${i.y1}, ${i.x2}, ${i.y2}, ${i.access}, ${i.crossid}\n"
         }
 
         text += "\nlist2\n\n"
@@ -35,9 +35,12 @@ class MainActivity : AppCompatActivity() {
             text += "${i.idx}, ${i.id}, ${i.x}, ${i.y}, ${i.nodes}\n"
         }
 
-        text += "\nid = ${db.findtoID(920, 440, nodesPlace)?.id}\n"
+        var place1: DataBaseHelper.PlaceNode? = db.findPlacetoXY(920, 440, nodesPlace)
+        var place2: DataBaseHelper.PlaceNode? = db.findPlacetoID(464, nodesPlace)
 
-        text += "\nx = ${db.findtoXY(464, nodesPlace)?.x}, y = ${db.findtoXY(464, nodesPlace)?.y}"
+        text += "\nid = ${place1?.id}\n"
+
+        text += "\nx = ${place2?.x}, y = ${place2?.y}, CrossNode = ${db.findCrosstoID(place2?.crossid, nodesCross)?.nodes}"
 
         textView.text = text
 /*

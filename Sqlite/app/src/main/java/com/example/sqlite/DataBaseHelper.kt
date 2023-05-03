@@ -57,8 +57,8 @@ class DataBaseHelper(private val context: Context) :
         }
     }
 
-    data class PlaceNode(val idx: Int, val id: Int, val name: String, val x: Int, val y: Int,
-                         val x1: Int, val y1: Int, val x2: Int, val y2: Int, val img1: Bitmap?, val img2: Bitmap?)
+    data class PlaceNode(val idx: Int, val id: Int, val name: String, val x: Int, val y: Int, val x1: Int, val y1: Int, val x2: Int, val y2: Int,
+                         val access: Int, val crossid: Int, val img1: Bitmap?, val img2: Bitmap?)
     data class CrossNode(val idx: Int, val id: Int, val x: Int, val y: Int, val nodes: List<Triple<Int, Int, String>>,
                          val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
 
@@ -76,14 +76,16 @@ class DataBaseHelper(private val context: Context) :
                 val name = it.getString(2)
                 val x = it.getInt(3)
                 val y = it.getInt(4)
+                val access = it.getInt(5)
+                val crossid = it.getInt(6)
 
-                val bytes1: ByteArray = it.getBlob(5)
-                val bytes2: ByteArray = it.getBlob(6)
+                val bytes1: ByteArray = it.getBlob(7)
+                val bytes2: ByteArray = it.getBlob(8)
 
                 val img1: Bitmap? = BitmapFactory.decodeByteArray(bytes1, 0, bytes1.size)
                 val img2: Bitmap? = BitmapFactory.decodeByteArray(bytes2, 0, bytes2.size)
 
-                placeList.add(PlaceNode(idx, id, name, x, y, x - 15, y - 15, x + 15, y + 15, img1, img2))
+                placeList.add(PlaceNode(idx, id, name, x, y, x - 15, y - 15, x + 15, y + 15, access, crossid, img1, img2))
             }
 
             it.close()
@@ -145,7 +147,7 @@ class DataBaseHelper(private val context: Context) :
         return crossList
     }
 
-    fun findtoID(x: Int, y: Int, list: List<PlaceNode>): PlaceNode? {
+    fun findPlacetoXY(x: Int, y: Int, list: List<PlaceNode>): PlaceNode? {
         for (i in list) {
             if ((i.x1 <= x && x <= i.x2) && (i.y1<= y && y <= i.y2)) {
                 return i
@@ -155,7 +157,17 @@ class DataBaseHelper(private val context: Context) :
         return null
     }
 
-    fun findtoXY(id: Int, list: List<PlaceNode>): PlaceNode? {
+    fun findPlacetoID(id: Int?, list: List<PlaceNode>): PlaceNode? {
+        for (i in list) {
+            if (i.id == id) {
+                return i
+            }
+        }
+
+        return null
+    }
+
+    fun findCrosstoID(id: Int?, list: List<CrossNode>): CrossNode? {
         for (i in list) {
             if (i.id == id) {
                 return i
