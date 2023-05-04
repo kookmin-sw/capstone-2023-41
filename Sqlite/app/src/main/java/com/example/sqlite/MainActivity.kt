@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         var text = "list1\n\n"
 
         for (i in nodesPlace) {
-            text += "${i.idx}, ${i.id}, ${i.name}, ${i.x}, ${i.y}, ${i.access}, ${i.crossid}\n"
+            text += "${i.idx}, ${i.id}, ${i.name}, ${i.x}, ${i.y}, ${i.access}\n"
         }
 
         text += "\nlist2\n\n"
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         var place2: DataBaseHelper.PlaceNode? = db.findPlacetoID(464, nodesPlace)
 
         text += "\nid = ${place1?.id}\n"
-        text += "\nx = ${place2?.x}, y = ${place2?.y}, CrossNode = ${db.findCrosstoID(place2?.crossid, nodesCross)?.nodes}"
+        text += "\nx = ${place2?.x}, y = ${place2?.y}, CrossNode = ${db.findCrosstoID(place2?.id, nodesCross)?.nodes}"
 
         text += "\n\n${dijk.findShortestPath(dijk.makeGraph())}"
 
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         imageView1 = findViewById(R.id.iv_img1)
         imageView2 = findViewById(R.id.iv_img2)
 
-        imageView1.setImageBitmap(nodesPlace[1].img2)
-        imageView2.setImageBitmap(nodesCross[2].imgNorth)
+        imageView1.setImageBitmap(nodesCross[4].imgSouth)
+        imageView2.setImageBitmap(nodesCross[4].imgWest)
     }
 }

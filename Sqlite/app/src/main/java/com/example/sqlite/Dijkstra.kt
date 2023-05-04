@@ -132,11 +132,13 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
     fun bulidDirect(path: List<Int>): List<Pair<Int, String>> {
         val result = ArrayList<Pair<Int, String>>()
 
-        for (i in 0..path.size - 2) {
-            result.add(Pair(path[i], findDirect(path[i], path[i + 1])))
+        result.add(Pair(path[0], "start"))
+
+        for (i in 1..path.size - 2) {
+            result.add(Pair(path[i], findDirect(path[i - 1], path[i])))
         }
 
-        result.add(Pair(path[path.size - 1], ""))
+        result.add(Pair(path[path.size - 1], "end"))
 
         return result
     }
