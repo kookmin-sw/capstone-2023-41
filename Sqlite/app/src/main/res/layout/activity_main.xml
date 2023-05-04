@@ -8,12 +8,19 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/tv_result"
+    <ScrollView
+        android:id="@+id/sv_result"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="20sp" />
-<!--
+        android:layout_height="190dp" >
+
+        <TextView
+            android:id="@+id/tv_result"
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:textSize="20sp" />
+
+    </ScrollView>
+
     <ImageView
         android:id="@+id/iv_img1"
         android:layout_width="match_parent"
@@ -23,5 +30,5 @@
         android:id="@+id/iv_img2"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
--->
+
 </LinearLayout>

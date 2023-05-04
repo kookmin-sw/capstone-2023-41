@@ -1,4 +1,4 @@
-package com.example.dijkstra
+package com.example.sqlite
 
 import com.example.sqlite.DataBaseHelper
 import java.util.*
@@ -49,7 +49,19 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return -1
     }
 
-    fun findShortestPath(graph: List<Triple<Int, Int, Int>>): List<Int> {
+    fun findDirect(firstID: Int, secondId: Int): String {
+        for (i in nodesCross) {
+            for (j in i.nodes) {
+                if (i.id == firstID && j.first == secondId) {
+                    return j.third
+                }
+            }
+        }
+
+        return ""
+    }
+
+    fun findShortestPath(graph: List<Triple<Int, Int, Int>>): List<Pair<Int, String>> {
         val distances = ArrayList<Pair<Int, Int>>()
         val visited = ArrayList<Pair<Int, Boolean>>()
         val previous = ArrayList<Pair<Int, Int>>()
@@ -103,7 +115,7 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return buildPath(previous)
     }
 
-    fun buildPath(previous: ArrayList<Pair<Int, Int>>): List<Int> {
+    fun buildPath(previous: ArrayList<Pair<Int, Int>>): List<Pair<Int, String>> {
         val path = mutableListOf<Int>()
         var currentIndex = endID
 
@@ -114,6 +126,18 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
 
         path.reverse()
 
-        return path
+        return bulidDirect(path)
+    }
+
+    fun bulidDirect(path: List<Int>): List<Pair<Int, String>> {
+        val result = ArrayList<Pair<Int, String>>()
+
+        for (i in 0..path.size - 2) {
+            result.add(Pair(path[i], findDirect(path[i], path[i + 1])))
+        }
+
+        result.add(Pair(path[path.size - 1], ""))
+
+        return result
     }
 }

@@ -1,7 +1,6 @@
 package com.example.sqlite
 
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.graphics.Bitmap
@@ -57,7 +56,7 @@ class DataBaseHelper(private val context: Context) :
         }
     }
 
-    data class PlaceNode(val idx: Int, val id: Int, val name: String, val x: Int, val y: Int, val x1: Int, val y1: Int, val x2: Int, val y2: Int,
+    data class PlaceNode(val idx: Int, val id: Int, val name: String, val x: Int, val y: Int,
                          val access: Int, val crossid: Int, val img1: Bitmap?, val img2: Bitmap?)
     data class CrossNode(val idx: Int, val id: Int, val x: Int, val y: Int, val nodes: List<Triple<Int, Int, String>>,
                          val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
@@ -85,7 +84,7 @@ class DataBaseHelper(private val context: Context) :
                 val img1: Bitmap? = BitmapFactory.decodeByteArray(bytes1, 0, bytes1.size)
                 val img2: Bitmap? = BitmapFactory.decodeByteArray(bytes2, 0, bytes2.size)
 
-                placeList.add(PlaceNode(idx, id, name, x, y, x - 15, y - 15, x + 15, y + 15, access, crossid, img1, img2))
+                placeList.add(PlaceNode(idx, id, name, x, y, access, crossid, img1, img2))
             }
 
             it.close()
@@ -149,7 +148,7 @@ class DataBaseHelper(private val context: Context) :
 
     fun findPlacetoXY(x: Int, y: Int, list: List<PlaceNode>): PlaceNode? {
         for (i in list) {
-            if ((i.x1 <= x && x <= i.x2) && (i.y1<= y && y <= i.y2)) {
+            if ((i.x - 15 <= x && x <= i.x + 15) && (i.y - 15 <= y && y <= i.y + 15)) {
                 return i
             }
         }
