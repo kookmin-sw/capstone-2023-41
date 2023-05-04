@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbarSize="10dp"
+    tools:context=".MainActivity">
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="224dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/light_gray"
+
+            />
+
+        <Button
+            android:id="@+id/qrButton"
+            android:layout_width="162dp"
+            android:layout_height="59dp"
+            android:layout_marginStart="240dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="6dp"
+            android:text="QR로 위치확인" />
+
+        <Button
+            android:id="@+id/btn_enter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="104dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:text="출입문"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_emergency"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="580dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="비상 연락 요청" />
+
+        <Button
+            android:id="@+id/btn_elevator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="201dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:text="엘레베이터"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_toilet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:text="화장실"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="135dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="250dp"
+            android:layout_marginTop="580dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/beige"
+            android:contentDescription="스피너 항목 선택"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:prompt="@string/spinner_prompt" />
+
+
+
+    </FrameLayout>
+
+    <com.example.capstone_kotlin.PinView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="440dp"
+        android:layout_marginTop="125dp"
+        app:src="@drawable/map" />
+
+
+</RelativeLayout>
