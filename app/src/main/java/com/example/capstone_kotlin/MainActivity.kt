@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-asdas
 // Activity 는 사용자와 상호작용 하기 위한 하나의 단위
 
 
