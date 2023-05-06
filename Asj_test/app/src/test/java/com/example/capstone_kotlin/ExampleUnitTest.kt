@@ -1,4 +1,4 @@
-package com.example.asj_test
+package com.example.capstone_kotlin
 
 import org.junit.Test
 
