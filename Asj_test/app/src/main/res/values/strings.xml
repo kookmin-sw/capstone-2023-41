@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Capstone_kotlin</string>
+    <string name="description_zoom_touch_close">Image</string>
+    <string name="spinner_prompt">검색어를 입력하세요.</string>
+</resources>

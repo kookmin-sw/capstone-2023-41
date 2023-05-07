@@ -20,14 +20,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
         setContentView(R.layout.activity_main)
 
-        // 액티비티 레이아웃을 activity_main.xml 파일에서 가져와 설정
-
-        var intent: Intent = Intent(this, MapActivity::class.java)
-        val spinner: Spinner = findViewById(R.id.spinner)
-        val items: MutableList<String> = ArrayList()
-        items.add("4층")
-        items.add("3층")
-        items.add("2층")
 
         val searchView = findViewById<SearchView>(R.id.searchView)
         val searchEditTextId = searchView.context.resources.getIdentifier("android:id/search_src_text", null, null)
@@ -54,39 +46,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
 
         val btn_emergency: Button = findViewById(R.id.btn_emergency)
+
         btn_emergency.bringToFront()
+
         btn_emergency.setOnClickListener {
             showEmergencyPopup()
         }
     }
 
-    private fun showEmergencyPopup() {
-        val contactNumber = "000-0000-000"
 
-        val inflater = layoutInflater
-        val popupView = inflater.inflate(R.layout.emergency_popup, null)
-
-        val alertDialog = AlertDialog.Builder(this)
-            .setView(popupView)
-            .setCancelable(true)
-            .create()
-
-        val contactTextView = popupView.findViewById<TextView>(R.id.contactNumber)
-        contactTextView.text = contactNumber
-
-        popupView.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE), 1)
-            } else {
-                val intent = Intent(Intent.ACTION_CALL)
-                intent.data = Uri.parse("tel:$contactNumber")
-                startActivity(intent)
-            }
-            alertDialog.dismiss()
-        }
-
-        alertDialog.show()
-    }
 }
