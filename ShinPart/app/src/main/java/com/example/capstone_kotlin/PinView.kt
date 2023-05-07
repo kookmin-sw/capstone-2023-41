@@ -41,7 +41,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
      * @param fix Pin 이미지가 지도와 함께 축소, 확대될지 결정합니다. 0:적용 1:적용안함
      * @param imageID Pin 이미지의 ID 값입니다. (ex: R.drawable.image_name)
      */
-    fun addPin(nPin: PointF?, fix: Int?, imageID: Int?)
+    fun addPin(nPin: PointF?, fix: Int, imageID: Int?)
     {
         pinArray.add(nPin!!)
         fixedArray.add(fix!!)
@@ -74,7 +74,11 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         invalidate()
     }
 
-    private fun initialise() {}
+    private fun initialise() {
+        invalidate();
+        this.setScaleAndCenter(1f, PointF(0F,0F));
+        invalidate()
+    }
 
     /**
      * 저장된 좌표, 라인들을 지도 위에 표시합니다.
@@ -136,6 +140,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     }
 
     init {
-        //initialise()
+
+        initialise()
     }
 }

@@ -13,7 +13,7 @@
         android:id="@+id/imageView"
         android:layout_width="386dp"
         android:layout_height="414dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         app:src="@drawable/duck" />
 
 </LinearLayout>

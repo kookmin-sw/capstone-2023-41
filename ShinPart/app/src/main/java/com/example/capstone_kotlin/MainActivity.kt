@@ -9,7 +9,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var intent: Intent = Intent(this, ScanActivity::class.java)
+        var intent: Intent = Intent(this, MapActivity::class.java)
+        intent.putExtra("QRstart", "429")
+        intent.putExtra("QRend", "464")
         startActivity(intent)
     }
 }
