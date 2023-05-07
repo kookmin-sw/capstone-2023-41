@@ -57,7 +57,7 @@ class DataBaseHelper(private val context: Context) :
     }
 
     data class PlaceNode(val idx: Int, val id: Int, val name: String, val x: Int, val y: Int,
-                         val access: Int, val crossid: Int, val img1: Bitmap?, val img2: Bitmap?)
+                         val access: Int, val img1: Bitmap?, val img2: Bitmap?)
     data class CrossNode(val idx: Int, val id: Int, val x: Int, val y: Int, val nodes: List<Triple<Int, Int, String>>,
                          val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
 
@@ -76,15 +76,14 @@ class DataBaseHelper(private val context: Context) :
                 val x = it.getInt(3)
                 val y = it.getInt(4)
                 val access = it.getInt(5)
-                val crossid = it.getInt(6)
 
-                val bytes1: ByteArray = it.getBlob(7)
-                val bytes2: ByteArray = it.getBlob(8)
+                val bytes1: ByteArray = it.getBlob(6)
+                val bytes2: ByteArray = it.getBlob(7)
 
                 val img1: Bitmap? = BitmapFactory.decodeByteArray(bytes1, 0, bytes1.size)
                 val img2: Bitmap? = BitmapFactory.decodeByteArray(bytes2, 0, bytes2.size)
 
-                placeList.add(PlaceNode(idx, id, name, x, y, access, crossid, img1, img2))
+                placeList.add(PlaceNode(idx, id, name, x, y, access, img1, img2))
             }
 
             it.close()
@@ -105,8 +104,8 @@ class DataBaseHelper(private val context: Context) :
                 val y = it.getInt(3)
                 val nodeList = it.getString(4)
 
-                val bytesEast: ByteArray = it.getBlob(5)
-                val bytesWest: ByteArray = it.getBlob(6)
+                val bytesEast: ByteArray? = it.getBlob(5)
+                val bytesWest: ByteArray? = it.getBlob(6)
                 val bytesSouth: ByteArray? = it.getBlob(7)
                 val bytesNorth: ByteArray? = it.getBlob(8)
 

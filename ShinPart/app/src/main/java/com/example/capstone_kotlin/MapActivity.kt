@@ -47,24 +47,17 @@ class MapActivity : AppCompatActivity() {
                 intent.removeExtra("QRstart")
                 intent.removeExtra("QRend")
                 if (startId != null) {
-                    var point = db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)
-                    var cid = db!!.findCrosstoID(point!!.crossid, nodesCross!!)
-                    //imageView?.addPin(PointF(cid!!.x.toFloat()*ratio!!, cid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
+                    var cid = db!!.findCrosstoID(startId.toInt(), nodesCross!!)
+                    imageView?.addPin(PointF(cid!!.x.toFloat()*ratio!!, cid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
                 }
                 if (endId != null)
                 {
-                    var point = db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)
-                    var cid = db!!.findCrosstoID(point!!.crossid, nodesCross!!)
-                    //imageView?.addPin(PointF(cid!!.x.toFloat()*ratio!!, cid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
+                    var cid = db!!.findCrosstoID(endId.toInt(), nodesCross!!)
+                    imageView?.addPin(PointF(cid!!.x.toFloat()*ratio!!, cid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
                 }
                 if (startId != null && endId != null)
                 {
-                    var points = db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)
-                    var cids = db!!.findCrosstoID(points!!.crossid, nodesCross!!)
-                    var pointe = db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)
-                    var cide = db!!.findCrosstoID(pointe!!.crossid, nodesCross!!)
-
-                    dijk = Dijkstra(nodesCross!!, cids!!.id, cide!!.id)
+                    dijk = Dijkstra(nodesCross!!, startId.toInt(), endId.toInt())
                     var root = dijk!!.findShortestPath(dijk!!.makeGraph())
                     for (i in root)
                     {
