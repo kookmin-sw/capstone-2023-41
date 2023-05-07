@@ -2836,6 +2836,7 @@ int drawable test_level_drawable 0x7f0700e0
 int drawable textviewborder 0x7f0700e1
 int drawable tooltip_frame_dark 0x7f0700e2
 int drawable tooltip_frame_light 0x7f0700e3
+int drawable white_space 0x7f0700e4
 int id ALT 0x7f080000
 int id BOTTOM_END 0x7f080001
 int id BOTTOM_START 0x7f080002
@@ -3068,6 +3069,8 @@ int id immediateStop 0x7f0800e4
 int id included 0x7f0800e5
 int id indeterminate 0x7f0800e6
 int id info 0x7f0800e7
+int id infoPic1 0x7f080213
+int id infoPic2 0x7f080214
 int id invisible 0x7f0800e8
 int id inward 0x7f0800e9
 int id italic 0x7f0800ea
@@ -3085,6 +3088,7 @@ int id linear 0x7f0800f5
 int id listMode 0x7f0800f6
 int id list_item 0x7f0800f7
 int id m3_side_sheet 0x7f0800f8
+int id map 0x7f080211
 int id marquee 0x7f0800f9
 int id masked 0x7f0800fa
 int id match_constraint 0x7f0800fb
@@ -3207,7 +3211,8 @@ int id scrollIndicatorDown 0x7f08016f
 int id scrollIndicatorUp 0x7f080170
 int id scrollView 0x7f080171
 int id scrollable 0x7f080172
-int id searchView 0x7f080173
+int id searchView1 0x7f080212
+int id searchView2 0x7f08020e
 int id search_badge 0x7f080174
 int id search_bar 0x7f080175
 int id search_bar_text_view 0x7f080176
