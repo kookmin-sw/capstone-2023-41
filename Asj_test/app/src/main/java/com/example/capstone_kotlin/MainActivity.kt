@@ -179,15 +179,26 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 var pointt = map?.viewToSourceCoord(e.x, e.y)
-
-                if((pointt!!.x/ratio!! > 900 && pointt!!.x/ratio!! < 1000) && (pointt!!.y/ratio!! > 400 && pointt!!.y/ratio!! < 500)){
-                    infoPic1.setImageBitmap(nodesPlace!![0].img1)
-                    infoPic2.setImageBitmap(nodesPlace!![0].img2)
+                var x = pointt!!.x/ratio!!
+                var y = pointt!!.y/ratio!!
+                var id = db!!.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace!!)
+                if (id != null) {
+                    infoPic1.setImageBitmap(id?.img1)
+                    infoPic2.setImageBitmap(id?.img2)
                     info.visibility = View.VISIBLE
                 }
                 else{
                     info.visibility = View.GONE
                 }
+                Toast.makeText(applicationContext, id.toString(), Toast.LENGTH_SHORT).show()
+//                if(i){
+//                    infoPic1.setImageBitmap(nodesPlace!![0].img1)
+//                    infoPic2.setImageBitmap(nodesPlace!![0].img2)
+//                    info.visibility = View.VISIBLE
+//                }
+//                else{
+//                    info.visibility = View.GONE
+//                }
 
 
                 return true
