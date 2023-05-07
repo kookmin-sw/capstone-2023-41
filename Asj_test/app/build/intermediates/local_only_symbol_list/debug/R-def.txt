@@ -42,6 +42,8 @@ id spaceImage1
 id spaceImage2
 id spinner
 id start
+id text1
+id text2
 id textView
 id textView2
 id tv_roomName
