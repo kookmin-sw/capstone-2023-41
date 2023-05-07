@@ -2837,6 +2837,7 @@ drawable test_level_drawable
 drawable textviewborder
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
+drawable white_space
 id ALT
 id BOTTOM_END
 id BOTTOM_START
@@ -3069,6 +3070,8 @@ id immediateStop
 id included
 id indeterminate
 id info
+id infoPic1
+id infoPic2
 id invisible
 id inward
 id italic
@@ -3086,6 +3089,7 @@ id linear
 id listMode
 id list_item
 id m3_side_sheet
+id map
 id marquee
 id masked
 id match_constraint
@@ -3208,7 +3212,8 @@ id scrollIndicatorDown
 id scrollIndicatorUp
 id scrollView
 id scrollable
-id searchView
+id searchView1
+id searchView2
 id search_badge
 id search_bar
 id search_bar_text_view
