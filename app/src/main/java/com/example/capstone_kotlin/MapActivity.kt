@@ -2,26 +2,22 @@
 
 package com.example.capstone_kotlin
 
-import android.R.*
+
 import android.graphics.*
 import android.os.Bundle
 import android.view.*
-
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.OnTouchListener
+
 // 사용자의 특정 움직임을 감지해서 이벤트가 발생하도록 만드는데 손가락으로 눌렀을때, 움직였을때, 손가락을 뗐을때 등 이런 여러가지 움직임을 감지하는 대표적인 인터페이스
 
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.davemorrissey.labs.subscaleview.ImageSource
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import java.util.*
-import kotlin.collections.ArrayList
-
 
 class MapActivity : AppCompatActivity() {
     // 이미지뷰를 저장하기 위한 PinView 변수와 제스처를 감지하기 위한 GestureDetector 변수를 초기화
-    var imageView: PinView? = null
+    private lateinit var imageView: PinView
     var gestureDetector: GestureDetector? = null
 
     // 테스트용
@@ -33,7 +29,9 @@ class MapActivity : AppCompatActivity() {
         setContentView(R.layout.activity_map)
 
         imageView = findViewById(R.id.imageView)
+        imageView.maxScale = 1.5f
         imageView?.setImage(ImageSource.resource(R.drawable.mirae_4f))
+
 
         // 아래는 이미지 터치에 따른 예제 코드임.
         gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
@@ -78,40 +76,4 @@ class MapActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
         }
     }
-
-/*
-    var INF = 1000000
-    var number = 6
-    var arry = arrayOf(arrayOf(123), arrayOf(123))
-    var v = arrayOf(false)
-    var d = arrayOf(number)
-    fun getSmallIndex() : Int {
-        var min = INF
-        var index = 0
-        for (i in 0..number) {
-            if(d[i] < min && !(v[i])) {
-                min = d[i]
-                index = i
-            }
-        }
-        return index
-    }
-    fun dijkstra(start: Int) {
-        for (i in 0..number) {
-            d[i] = arry[start][i]
-        }
-        v[start]
-        for (i in 0..number-2) {
-            var current = getSmallIndex()
-            v[current] = true
-            for(j in 0..number) {
-                if(!v[j]) {
-                    if(d[current] + arry[current][j] < d[j]) {
-                        d[j] = d[current] + arry[current][j]
-                    }
-                }
-            }
-        }
-    }
-*/
 }

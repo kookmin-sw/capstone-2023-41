@@ -2,12 +2,11 @@
 
 package com.example.capstone_kotlin
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.zxing.integration.android.IntentIntegrator
 
@@ -15,17 +14,12 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // activity_scan.xml 레이아웃을 이 액티비티에 표시
-        setContentView(R.layout.activity_scan)
 
-        // 스캔 버튼 초기화
-        val scanBtn = findViewById<Button>(R.id.scanBtn) as Button
-        // 클릭 리스너 설정
-        scanBtn.setOnClickListener(this)
+        scanCode()
     }
 
     override fun onClick(p0: View?) {
-        scanCode() // 스캔 함수 호출
+        // onClick 함수 없으면 실행 안됨.
     }
 
     // QR코드 스캔 함수
@@ -44,7 +38,8 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
         integrator.setPrompt("출발지 QR코드를 스캔해주세요.")
 
         // 전면 카메라로 변경 ( 선택 할 수 있음)
-        integrator.setCameraId(1)
+        // 0 = 후면, 1 = 전면
+        integrator.setCameraId(0)
 
         // 스캔 시작
         integrator.initiateScan()
@@ -61,32 +56,14 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
         if (result != null) {
             // 스캔 결과가 비어있지 않은 경우
             if (result.contents != null) {
-
                 // MainActivity로 결과 전송을 위한 Intent 객체 생성
-                val intent : Intent = Intent(this@ScanActivity, MainActivity::class.java);
-                intent.putExtra("QRdata", result.contents)
-
-                //ResultActivity 내에서 ...
-                //Intent intent = getIntent();
-                //String myData = intent.getStringExtra("QRdata");
-
-                // 스캔 결과 출력을 위한 AlertDialog.Builder 객체 생성
-                val builder = AlertDialog.Builder(this)
-                builder.setMessage(result.contents)
-                builder.setTitle("Scanning Result")
-
-                // 스캔 다시 실행 버튼
-                builder.setPositiveButton(
-                    "Scan Again"
-                ) { dialogInterface, i -> scanCode() }.setNegativeButton(
-                    "finish"
-                ) { dialogInterface, i -> finish() }
-
-                // AlertDialog 생성 및 출력
-                val dialog = builder.create()
-                dialog.show()
-            } else {
+                val ToMainIntent : Intent = Intent(this@ScanActivity, MainActivity::class.java);
+                ToMainIntent.putExtra("QRdata", result.contents)
+                setResult(Activity.RESULT_OK, ToMainIntent)
+                finish()
+            } else {    // 뒤로가기 버튼을 누르는 등 아무것도 촬영 안한 경우
                 Toast.makeText(this, "QR코드에 아무것도 담겨있지 않아요.", Toast.LENGTH_LONG).show()
+                finish()
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

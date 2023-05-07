@@ -5,8 +5,7 @@
     <!-- 카메라 권한을 사용 -->
     <uses-permission android:name="android.permission.CAMERA" />
 
-
-    <!-- 통화 권한 사용하기 -->
+    <!-- 전화 발신 권한 사용 -->
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
