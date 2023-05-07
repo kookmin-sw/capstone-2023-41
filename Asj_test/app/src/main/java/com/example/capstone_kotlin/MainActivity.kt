@@ -9,6 +9,7 @@ import android.os.Bundle // Bundle은 액티비티가 시스템에서 재생성�
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.*
 import com.davemorrissey.labs.subscaleview.ImageSource
@@ -26,13 +27,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var text1: TextView
     private lateinit var text2: TextView
     private lateinit var map: PinView
+    
+    private lateinit var gestureDetector: GestureDetector
 
-    var gestureDetector: GestureDetector? = null
+    private lateinit var db: DataBaseHelper
+    private lateinit var nodesPlace: List<DataBaseHelper.PlaceNode>
+    private lateinit var nodesCross: List<DataBaseHelper.CrossNode>
 
-    var db: DataBaseHelper? = null
-    var nodesPlace: List<DataBaseHelper.PlaceNode>? = null
-    var nodesCross: List<DataBaseHelper.CrossNode>? = null
-    var ratio: Float? = null
+    var ratio = 0F
 
     override fun onCreate(savedInstanceState: Bundle?) { // onCreate 함수를 오버라이드. 이 함수는 액티비티가 생성될 때 호출됨.
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
@@ -40,8 +42,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // DB
         db = DataBaseHelper(this)
-        nodesPlace = db!!.getNodesPlace()
-        nodesCross = db!!.getNodesCross()
+        nodesPlace = db.getNodesPlace()
+        nodesCross = db.getNodesCross()
 
         // 지도
         map = findViewById<PinView>(R.id.map)
@@ -69,22 +71,19 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         text2 = findViewById(R.id.text2)
 
         // 화면 비율
-        ratio = map?.getResources()!!.getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
+        ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
 
-        text1.setText("${nodesPlace!![0].x} (${nodesPlace!![0].y}호)")
+        text1.setText("${nodesPlace[0].x} (${nodesPlace[0].y}호)")
 
-        if(nodesPlace!![0].access == 0){
+        if(nodesPlace[0].access == 0){
             text2.setBackgroundColor(Color.RED)
         }
-        else if(nodesPlace!![0].access == 1){
+        else if(nodesPlace[0].access == 1){
             text2.setBackgroundColor(Color.YELLOW)
         }
         else{
             text2.setBackgroundColor(Color.GREEN)
         }
-
-//        infoPic1.setImageBitmap(nodesPlace!![0].img1)
-//        infoPic2.setImageBitmap(nodesPlace!![0].img2)
 
         // 출발, 도착 버튼
         var start = findViewById<Button>(R.id.start)
@@ -178,10 +177,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 특정 좌표(현재 자주스)를 누를 때만 정보창 활성화.
         gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                var pointt = map?.viewToSourceCoord(e.x, e.y)
-                var x = pointt!!.x/ratio!!
-                var y = pointt!!.y/ratio!!
-                var id = db!!.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace!!)
+                var pointt = map.viewToSourceCoord(e.x, e.y)
+                var x = pointt!!.x/ratio
+                var y = pointt!!.y/ratio
+                var id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
                 if (id != null) {
                     infoPic1.setImageBitmap(id?.img1)
                     infoPic2.setImageBitmap(id?.img2)
@@ -191,24 +190,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     info.visibility = View.GONE
                 }
                 Toast.makeText(applicationContext, id.toString(), Toast.LENGTH_SHORT).show()
-//                if(i){
-//                    infoPic1.setImageBitmap(nodesPlace!![0].img1)
-//                    infoPic2.setImageBitmap(nodesPlace!![0].img2)
-//                    info.visibility = View.VISIBLE
-//                }
-//                else{
-//                    info.visibility = View.GONE
-//                }
-
 
                 return true
             }
         })
 
-        // 클릭 위치마다 띄우는 사진을 달리하기 위한 테스트용 함수
-
+        // 클릭 이벤트 처리
         map.setOnTouchListener { view, event ->
-            gestureDetector!!.onTouchEvent(
+            gestureDetector.onTouchEvent(
                 event
             )
         }
@@ -249,15 +238,15 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     // 입력된 x,y 좌표 값에 대한 처리 함수 예제
     private fun check_area(x: Float, y: Float)
     {
-        var testX = x/ratio!!
-        var testY = y/ratio!!
+        var testX = x/ratio
+        var testY = y/ratio
 
         var msg2 = testX.toString() + ":" + testY.toString()
         Toast.makeText(applicationContext, msg2, Toast.LENGTH_SHORT).show()
-        var id = db!!.findPlacetoXY(testX.toInt(), testY.toInt(), nodesPlace!!)
+        var id = db.findPlacetoXY(testX.toInt(), testY.toInt(), nodesPlace)
         if (id != null)
         {
-            map?.addPin(PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
+            map?.addPin(PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
         }
         // 핀 지우기 예제
 //        if ( 'condition' )
