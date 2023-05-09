@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // 테스트위해서 lateinit 설정
     private lateinit var searchView1: SearchView
+    private lateinit var searchView2: SearchView
 
     private var isButtonsVisible = false
 
@@ -53,8 +54,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         map = findViewById(R.id.map);
 
         // 출발지, 목적지 입력 서치뷰
-        searchView1 = findViewById<SearchView>(R.id.searchView1)
-        val searchView2 = findViewById<SearchView>(R.id.searchView2)
+        searchView1 = findViewById(R.id.searchView1)
+        searchView2 = findViewById(R.id.searchView2)
 
         // QR 촬영 버튼
         var qrButton: Button = findViewById(R.id.qrButton)
@@ -161,43 +162,53 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
 
                 var pointt = map?.viewToSourceCoord(e.x, e.y);
-                if(check_area(pointt!!.x, pointt!!.y) != null)
+                if (check_area(pointt!!.x, pointt!!.y) != null)
                 {
-                    if (info.visibility == View.VISIBLE) {
+                    val check = check_area(pointt!!.x, pointt!!.y)
+
+                    info.visibility = View.VISIBLE
+
+                    infoText1.text = "${check!!.name}"
+
+                    if (check!!.access == 0) {
+                        infoText2.setBackgroundColor(Color.RED)
+                    }
+                    else if (check!!.access == 1) {
+                        infoText2.setBackgroundColor(Color.YELLOW)
+                    }
+                    else {
+                        infoText2.setBackgroundColor(Color.GREEN)
+                    }
+
+                    infoPic1.setImageBitmap(check!!.img1)
+                    infoPic2.setImageBitmap(check!!.img2)
+
+                    // 출발 버튼 누르면 searchView1 채우기
+                    start.setOnClickListener{
+                        searchView1.setQuery(check!!.name, true)
+
+                        if (startId != null) {
+                            map?.clearPin()
+                            map?.addPin((PointF(check!!.x.toFloat()*ratio!!, check!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+                        }
+                        startId = check!!.id.toString()
+                        Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
+                        mapInit()
                         info.visibility = View.GONE
-                    } else {
-                        info.visibility = View.VISIBLE
+                    }
 
-                        infoText1.text = "${check_area(pointt!!.x, pointt!!.y)!!.name} (${check_area(pointt!!.x, pointt!!.y)!!.id}호)"
-
-                        if (check_area(pointt!!.x, pointt!!.y)!!.access == 0) {
-                            infoText2.setBackgroundColor(Color.RED)
-                        }
-                        else if (check_area(pointt!!.x, pointt!!.y)!!.access == 1) {
-                            infoText2.setBackgroundColor(Color.YELLOW)
-                        }
-                        else {
-                            infoText2.setBackgroundColor(Color.GREEN)
+                    // 도착 버튼 누르면 searchView2 채우기
+                    end.setOnClickListener{
+                        searchView2.setQuery(check!!.name, true)
+                        if (endId != null) {
+                            map?.clearPin()
+                            map?.addPin((PointF(check!!.x.toFloat()*ratio!!, check!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
                         }
 
-                        infoPic1.setImageBitmap(check_area(pointt!!.x, pointt!!.y)!!.img1)
-                        infoPic2.setImageBitmap(check_area(pointt!!.x, pointt!!.y)!!.img2)
-
-                        // 출발 버튼 누르면 searchView1 채우기
-                        start.setOnClickListener{
-                            searchView1.setQuery(check_area(pointt!!.x, pointt!!.y)!!.name, true)
-                            startId = check_area(pointt!!.x, pointt!!.y)!!.id.toString()
-                            Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
-                            mapInit()
-                        }
-
-                        // 도착 버튼 누르면 searchView2 채우기
-                        end.setOnClickListener{
-                            searchView2.setQuery(check_area(pointt!!.x, pointt!!.y)!!.name, true)
-                            endId = check_area(pointt!!.x, pointt!!.y)!!.id.toString()
-                            Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
-                            mapInit()
-                        }
+                        endId = check!!.id.toString()
+                        Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
+                        mapInit()
+                        info.visibility = View.GONE
                     }
                 }
                 else if (info.visibility == View.VISIBLE) {
@@ -288,6 +299,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         var scid: DataBaseHelper.CrossNode? = null
         var ecid: DataBaseHelper.CrossNode? = null
 
+        var navi = findViewById<FrameLayout>(R.id.navi)
+
+        var navi_img1 = findViewById<ImageView>(R.id.navi_img1)
+        var navi_img2 = findViewById<ImageView>(R.id.navi_img2)
+
+        var navi_start = findViewById<Button>(R.id.navi_start)
+        var navi_end = findViewById<Button>(R.id.navi_end)
+
         var intent : Intent = getIntent()
         var qrData : String? = intent!!.getStringExtra("QRdata")
         if (qrData != null)
@@ -319,10 +338,51 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 if (i.second != "start" && i.second != "end" && i.second != "place") {
                     map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.crossroad)
                 }
+
+                if (i.second == "east") {
+                    navi_img1.setImageBitmap(pointt!!.imgEast)
+                }
+
+                if (i.second == "south") {
+                    navi_img2.setImageBitmap(pointt!!.imgSouth)
+                }
             }
 
             startId = ""
             endId = ""
+
+            navi.visibility = View.VISIBLE
+
+            navi_img1.visibility = View.GONE
+            navi_img2.visibility = View.GONE
+
+            navi.setOnTouchListener { _, event ->
+                // frameLayout을 터치할 때 이벤트가 발생하면 true를 반환하여
+                // 해당 이벤트를 소비하고, map의 onTouchEvent를 호출하지 않도록 합니다.
+                true
+            }
+
+            navi_start.setOnClickListener {
+                navi.setBackgroundResource(R.drawable.white_space)
+
+                navi_start.visibility = View.GONE
+
+                navi_img1.visibility = View.VISIBLE
+                navi_img2.visibility = View.VISIBLE
+            }
+
+            navi_end.setOnClickListener{
+
+                searchView2.setQuery("", true)
+                searchView1.setQuery("", true)
+
+                map?.clearPin()
+
+                startId = null
+                endId = null
+
+                navi.visibility = View.GONE
+            }
         }
     }
 
@@ -386,6 +446,22 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         if (id != null)
         {
             //map?.clearPin();
+            if (startId == "") {
+                return null
+            }
+
+            if (startId != null) {
+                map?.clearPin()
+                map?.addPin((PointF(db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+            }
+            else if (endId != null) {
+                map?.clearPin()
+                map?.addPin((PointF(db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+            }
+            else {
+                map?.clearPin()
+            }
+
             map?.addPin(PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
             return id
         }
@@ -398,12 +474,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map?.clearPin()
             map?.addPin((PointF(db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
         }
-
         else if (endId != null) {
             map?.clearPin()
             map?.addPin((PointF(db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
         }
-
         else {
             map?.clearPin()
         }
