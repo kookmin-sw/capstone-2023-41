@@ -79,6 +79,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 지도 크기 제한
         map!!.maxScale = 0.5f
 
+        db = DataBaseHelper(this)
+        nodesPlace = db!!.getNodesPlace()
+        nodesCross = db!!.getNodesCross()
+
         // QR 촬영 버튼 활성화.
         qrButton.setOnClickListener{
             val intent = Intent(this, ScanActivity::class.java)
@@ -149,22 +153,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             true
         }
 
-        // 출발 버튼 누르면 searchView1 채우기
-        start.setOnClickListener{
-            searchView1.setQuery("429", true)
-            startId = "429"
-            Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
-            mapInit()
-        }
-
-        // 도착 버튼 누르면 searchView2 채우기
-        end.setOnClickListener{
-            searchView2.setQuery("464", true)
-            endId = "464"
-            Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
-            mapInit()
-        }
-
         var touchTime = 0L
 
 
@@ -194,6 +182,22 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                         infoPic1.setImageBitmap(check_area(pointt!!.x, pointt!!.y)!!.img1)
                         infoPic2.setImageBitmap(check_area(pointt!!.x, pointt!!.y)!!.img2)
+
+                        // 출발 버튼 누르면 searchView1 채우기
+                        start.setOnClickListener{
+                            searchView1.setQuery(check_area(pointt!!.x, pointt!!.y)!!.name, true)
+                            startId = check_area(pointt!!.x, pointt!!.y)!!.id.toString()
+                            Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
+                            mapInit()
+                        }
+
+                        // 도착 버튼 누르면 searchView2 채우기
+                        end.setOnClickListener{
+                            searchView2.setQuery(check_area(pointt!!.x, pointt!!.y)!!.name, true)
+                            endId = check_area(pointt!!.x, pointt!!.y)!!.id.toString()
+                            Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
+                            mapInit()
+                        }
                     }
                 }
                 else if (info.visibility == View.VISIBLE) {
@@ -268,11 +272,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // MapActivity 연결부
         map?.setImage(ImageSource.resource(R.drawable.mirae_4f))
 
-
-        db = DataBaseHelper(this)
-        nodesPlace = db!!.getNodesPlace()
-        nodesCross = db!!.getNodesCross()
-
         // 그려졌을때 실행되는 함수
         map?.viewTreeObserver!!.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -318,9 +317,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 map?.addLine(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), Color.GREEN)
 
                 if (i.second != "start" && i.second != "end" && i.second != "place") {
-                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
+                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.crossroad)
                 }
             }
+
+            startId = ""
+            endId = ""
         }
     }
 
@@ -387,10 +389,27 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map?.addPin(PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
             return id
         }
+
+        if (startId == "") {
+            return null
+        }
+
+        if (startId != null) {
+            map?.clearPin()
+            map?.addPin((PointF(db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+        }
+
+        else if (endId != null) {
+            map?.clearPin()
+            map?.addPin((PointF(db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+        }
+
+        else {
+            map?.clearPin()
+        }
+
         return null
     }
-
-
 }
 
 

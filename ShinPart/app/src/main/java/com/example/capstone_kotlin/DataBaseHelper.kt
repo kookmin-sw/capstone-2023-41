@@ -147,7 +147,7 @@ class DataBaseHelper(private val context: Context) :
 
     fun findPlacetoXY(x: Int, y: Int, list: List<PlaceNode>): PlaceNode? {
         for (i in list) {
-            if ((i.x - 15 <= x && x <= i.x + 15) && (i.y - 15 <= y && y <= i.y + 15)) {
+            if ((i.x - 25 <= x && x <= i.x + 25) && (i.y - 25 <= y && y <= i.y + 25)) {
                 return i
             }
         }
