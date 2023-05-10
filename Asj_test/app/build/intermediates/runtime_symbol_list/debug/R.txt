@@ -2996,6 +2996,7 @@ int id design_menu_item_action_area 0x7f08009b
 int id design_menu_item_action_area_stub 0x7f08009c
 int id design_menu_item_text 0x7f08009d
 int id design_navigation_view 0x7f08009e
+int id destination 0x7f080215
 int id dialog_button 0x7f08009f
 int id dimensions 0x7f0800a0
 int id direct 0x7f0800a1
@@ -3071,6 +3072,8 @@ int id indeterminate 0x7f0800e6
 int id info 0x7f0800e7
 int id infoPic1 0x7f0800e8
 int id infoPic2 0x7f0800e9
+int id infoText1 0x7f080212
+int id infoText2 0x7f080213
 int id invisible 0x7f0800ea
 int id inward 0x7f0800eb
 int id italic 0x7f0800ec
@@ -3087,6 +3090,9 @@ int id line3 0x7f0800f6
 int id linear 0x7f0800f7
 int id listMode 0x7f0800f8
 int id list_item 0x7f0800f9
+int id loadInfo 0x7f080216
+int id loadInfoPic1 0x7f080217
+int id loadInfoPic2 0x7f080218
 int id m3_side_sheet 0x7f0800fa
 int id map 0x7f0800fb
 int id marquee 0x7f0800fc
@@ -3148,6 +3154,7 @@ int id mtrl_picker_text_input_range_start 0x7f080133
 int id mtrl_picker_title_text 0x7f080134
 int id mtrl_view_tag_bottom_padding 0x7f080135
 int id multiply 0x7f080136
+int id navi 0x7f080214
 int id navigation_bar_item_active_indicator_view 0x7f080137
 int id navigation_bar_item_icon_container 0x7f080138
 int id navigation_bar_item_icon_view 0x7f080139
@@ -3296,7 +3303,6 @@ int id tag_unhandled_key_event_manager 0x7f0801c7
 int id tag_unhandled_key_listeners 0x7f0801c8
 int id tag_window_insets_animation_callback 0x7f0801c9
 int id text 0x7f0801ca
-int id text1 0x7f080211
 int id text2 0x7f0801cb
 int id textEnd 0x7f0801cc
 int id textSpacerNoButtons 0x7f0801cd

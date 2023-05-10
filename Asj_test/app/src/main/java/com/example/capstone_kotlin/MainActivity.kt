@@ -6,11 +6,8 @@ import android.graphics.PointF
 import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity // AppCompatActivity 클래스를 임포트. AppCompatActivity는 안드로이드 앱에서 사용되는 기본 클래스
 import android.os.Bundle // Bundle은 액티비티가 시스템에서 재생성될 때 데이터를 저장하고 다시 가져오는 데 사용
-import android.view.GestureDetector
+import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
 import android.widget.*
 import com.davemorrissey.labs.subscaleview.ImageSource
 //import androidx.lifecycle.viewmodel.CreationExtras.Empty.map
@@ -24,15 +21,32 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // 테스트위해서 lateinit 설정
     private lateinit var searchView1: SearchView
-    private lateinit var text1: TextView
-    private lateinit var text2: TextView
+    private lateinit var infoText1: TextView
+    private lateinit var infoText2: TextView
     private lateinit var map: PinView
-    
+
+    private lateinit var navi: Button
+
+    private lateinit var info: FrameLayout
+    private lateinit var infoPic1: ImageView
+    private lateinit var infoPic2: ImageView
     private lateinit var gestureDetector: GestureDetector
+
+    private lateinit var loadInfo: FrameLayout
 
     private lateinit var db: DataBaseHelper
     private lateinit var nodesPlace: List<DataBaseHelper.PlaceNode>
     private lateinit var nodesCross: List<DataBaseHelper.CrossNode>
+
+    private var id: DataBaseHelper.PlaceNode? = null
+
+    private var returnedData: String? = null
+
+    private lateinit var dijk: Dijkstra
+
+    private lateinit var startId: String
+    private lateinit var endId: String
+
 
     var ratio = 0F
 
@@ -52,6 +66,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 출발지, 목적지 입력 서치뷰
         searchView1 = findViewById<SearchView>(R.id.searchView1)
         val searchView2 = findViewById<SearchView>(R.id.searchView2)
+        val destination = findViewById<LinearLayout>(R.id.destination)
 
         // QR 촬영 버튼
         var qrButton: Button = findViewById(R.id.qrButton)
@@ -60,30 +75,24 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         val spinner: Spinner = findViewById(R.id.spinner)
 
         // 정보창
-        var info = findViewById<FrameLayout>(R.id.info)
+        info = findViewById<FrameLayout>(R.id.info)
 
         // 정보창에 띄울 사진들
-        var infoPic1 = findViewById<ImageView>(R.id.infoPic1)
-        var infoPic2 = findViewById<ImageView>(R.id.infoPic2)
+        infoPic1 = findViewById<ImageView>(R.id.infoPic1)
+        infoPic2 = findViewById<ImageView>(R.id.infoPic2)
 
         // 정보창에 띄울 이름과 접근성
-        text1 = findViewById(R.id.text1)
-        text2 = findViewById(R.id.text2)
+        infoText1 = findViewById(R.id.infoText1)
+        infoText2 = findViewById(R.id.infoText2)
+
+        // 길찾기 버튼
+        navi = findViewById(R.id.navi)
+
+        // 경로 안내 화면
+        loadInfo = findViewById(R.id.loadInfo)
 
         // 화면 비율
         ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
-
-        text1.setText("${nodesPlace[0].x} (${nodesPlace[0].y}호)")
-
-        if(nodesPlace[0].access == 0){
-            text2.setBackgroundColor(Color.RED)
-        }
-        else if(nodesPlace[0].access == 1){
-            text2.setBackgroundColor(Color.YELLOW)
-        }
-        else{
-            text2.setBackgroundColor(Color.GREEN)
-        }
 
         // 출발, 도착 버튼
         var start = findViewById<Button>(R.id.start)
@@ -98,6 +107,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 지도 크기 제한
         map.maxScale = 1f
 
+        // 길찾기 버튼 활성화.
+        navi.setOnClickListener{
+            // 구현 필요.
+            loadInfo.visibility = View.VISIBLE
+        }
+
         // QR 촬영 버튼 활성화.
         qrButton.setOnClickListener{
             val intent = Intent(this, ScanActivity::class.java)
@@ -111,38 +126,35 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         items.add("미래관 2층")
 
         // 출발지와 목적지 입력 서치뷰 활성화.
-        // 2023-05-27 15시 기준 : 현재 serachView 를 입력 시 serachView2가 보임.
-        // 두 searchView 모두 비어있어야 searchView2 사라짐.
         searchView1.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isEmpty() && searchView2.query.isEmpty()) {
-                    searchView2.visibility = View.GONE
+                    destination.visibility = View.GONE
                 }
                 return true
             }
 
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (query.isEmpty() && searchView2.query.isEmpty()) {
-                    searchView2.visibility = View.GONE
+                    destination.visibility = View.GONE
                 } else {
                     // QR 로 데이터 받아오거나 DB에 있는 지명 검색 완료 시
-                    // 정보창 보이게 함. 123은 테스트.
-                    if(query == "123123123"){
-                        info.visibility = View.VISIBLE
-                    }
-                    searchView2.visibility = View.VISIBLE
+                    // 정보창 보이게 함.
+                    destination.visibility = View.VISIBLE
                 }
                 return true
             }
         })
 
+        // searchView2(목적지 입력)이 입력되면 searchView1에 '출발지를 입력하세요.' 라고 변경.
         searchView2.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
                 // searchView2의 입력 상태에 따라 처리
                 if (newText.isEmpty() && searchView1.query.isEmpty()) {
-                    searchView2.visibility = View.GONE
+                    destination.visibility = View.GONE
                 } else {
-                    searchView2.visibility = View.VISIBLE
+                    destination.visibility = View.VISIBLE
+                    searchView1.queryHint = "출발지를 입력하세요."
                 }
                 return true
             }
@@ -164,33 +176,32 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 출발 버튼 누르면 searchView1 채우기
         start.setOnClickListener{
-            searchView1.setQuery("test", true)
+            searchView1.setQuery(id?.id.toString(), true)
+            startId = id?.id.toString()
             info.visibility = View.GONE
         }
 
         // 도착 버튼 누르면 searchView2 채우기
         end.setOnClickListener{
-            searchView2.setQuery("test2", true)
+            searchView2.setQuery(id?.id.toString(), true)
+            endId = id?.id.toString()
             info.visibility = View.GONE
         }
 
-        // 특정 좌표(현재 자주스)를 누를 때만 정보창 활성화.
+        // DB 에 등록된 노드 정보 활성화.
         gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 var pointt = map.viewToSourceCoord(e.x, e.y)
                 var x = pointt!!.x/ratio
                 var y = pointt!!.y/ratio
-                var id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
-                if (id != null) {
-                    infoPic1.setImageBitmap(id?.img1)
-                    infoPic2.setImageBitmap(id?.img2)
-                    info.visibility = View.VISIBLE
+                id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
+                if(id != null){
+                    showInfo(id)
                 }
                 else{
-                    info.visibility = View.GONE
+                    showInfo(null)
                 }
                 Toast.makeText(applicationContext, id.toString(), Toast.LENGTH_SHORT).show()
-
                 return true
             }
         })
@@ -220,18 +231,69 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
+        // 경로 그리기
+//        map.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
+//            override fun onGlobalLayout() {
+//                mapInit();
+//                map.viewTreeObserver.removeOnGlobalLayoutListener(this)
+//            }
+//        })
     }
 
+    fun mapInit()
+    {
+        ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
+//
+        var scid: DataBaseHelper.CrossNode? = null
+        var ecid: DataBaseHelper.CrossNode? = null
+        if(returnedData == null){
+            return
+        }
+//        else if (returnedData != null)
+//        {
+//            scid = db.findCrosstoID(startId.toInt(), nodesCross)
+//            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+//            return
+//        }
+//        if(startId != null){
+//            scid = db.findCrosstoID(startId.toInt(), nodesCross)
+//            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+//        }
+//        else if(endId != null){
+//            ecid = db.findCrosstoID(endId.toInt(), nodesCross)
+//            map?.addPin(PointF(ecid!!.x.toFloat()*ratio!!, ecid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
+//        }
+//        if (startId != null && endId != null)
+//        {
+////            map.clearPin();
+////            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+////            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+//            dijk = Dijkstra(nodesCross, startId.toInt(), endId.toInt())
+//            var root = dijk.findShortestPath(dijk.makeGraph())
+//            for (i in root)
+//            {
+//                var pointt = db.findCrosstoID(i.first.toInt(), nodesCross)
+//                map.addLine(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), Color.GREEN)
+//                if (i.second != "start" && i.second != "end" && i.second != "place") {
+//                    map.addPin(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+//                }
+//            }
+//        }
+    }
+
+
     // QR 촬영 후 데이터 값 받아옴.
-    // 2023-05-27 15시 기준 현재 받아온 데이터 값을 searchView1 에 넣음.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val returnedData = data?.getStringExtra("QRdata")
+            returnedData = data?.getStringExtra("QRdata")
             Toast.makeText(this, returnedData, Toast.LENGTH_SHORT).show()
-            searchView1.setQuery(returnedData, false)
-
+//            if(returnedData != null && returnedData is DataBaseHelper.PlaceNode){
+//
+//            }
+//            showInfo(returnedData)
+            showInfoTest(returnedData)
         }
     }
 
@@ -253,5 +315,60 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 //        {
 //            imageView?.clearPin()
 //        }
+    }
+
+    // QR에서 DB 정보를 받아올 경우.
+    // 추후 수정 필요 (QR에서 받아오는 데이터는 스트링 형태이므로 문자열 슬라이싱 및 타입 변환 필요)
+    fun showInfo(id: DataBaseHelper.PlaceNode?){
+        if (id != null) {
+            // 정보 사진
+            infoPic1.setImageBitmap(id?.img1)
+            infoPic2.setImageBitmap(id?.img2)
+            // 접근성
+            if(id?.access == 0){
+                infoText2.setBackgroundColor(Color.RED)
+            }
+            if(id?.access == 1){
+                infoText2.setBackgroundColor(Color.YELLOW)
+            }
+            if(id?.access == 2){
+                infoText2.setBackgroundColor(Color.GREEN)
+            }
+            // 지명
+            infoText1.setText(id?.name + id?.id)
+            info.visibility = View.VISIBLE
+        }
+        else{
+            info.visibility = View.GONE
+        }
+    }
+
+    // 현재 QR 에서 강의실 호수 숫자만 리턴하므로 그에 대한 테스트용 함수.
+    fun showInfoTest(id: String?){
+        if (id != null) {
+            for (i in nodesPlace.indices) {
+                if (nodesPlace[i].id == id.toInt()) {
+                    // 정보 사진
+                    infoPic1.setImageBitmap(nodesPlace[i].img1)
+                    infoPic2.setImageBitmap(nodesPlace[i].img2)
+                    // 접근성
+                    if (nodesPlace[i].access == 0) {
+                        infoText2.setBackgroundColor(Color.RED)
+                    }
+                    if (nodesPlace[i].access == 1) {
+                        infoText2.setBackgroundColor(Color.YELLOW)
+                    }
+                    if (nodesPlace[i].access == 2) {
+                        infoText2.setBackgroundColor(Color.GREEN)
+                    }
+                    // 지명
+                    infoText1.setText(nodesPlace[i].name + nodesPlace[i].id)
+                    info.visibility = View.VISIBLE
+                }
+            }
+        }
+        else{
+            info.visibility = View.GONE
+        }
     }
 }

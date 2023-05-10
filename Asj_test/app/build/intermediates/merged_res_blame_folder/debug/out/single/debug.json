@@ -24,12 +24,12 @@
         "source": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-main-33:\\xml\\backup_rules.xml"
     },
     {
-        "merged": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-merged_res-31:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
-        "source": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-main-33:\\mipmap-xhdpi\\ic_launcher_round.webp"
-    },
-    {
         "merged": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-merged_res-31:\\mipmap-mdpi_ic_launcher.webp.flat",
         "source": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-main-33:\\mipmap-mdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-merged_res-31:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-main-33:\\mipmap-xhdpi\\ic_launcher_round.webp"
     },
     {
         "merged": "C:\\Users\\asj\\.gradle\\daemon\\7.5\\com.example.capstone_kotlin.app-merged_res-31:\\layout_activity_map.xml.flat",
