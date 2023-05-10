@@ -2997,6 +2997,7 @@ id design_menu_item_action_area
 id design_menu_item_action_area_stub
 id design_menu_item_text
 id design_navigation_view
+id destination
 id dialog_button
 id dimensions
 id direct
@@ -3072,6 +3073,8 @@ id indeterminate
 id info
 id infoPic1
 id infoPic2
+id infoText1
+id infoText2
 id invisible
 id inward
 id italic
@@ -3088,6 +3091,9 @@ id line3
 id linear
 id listMode
 id list_item
+id loadInfo
+id loadInfoPic1
+id loadInfoPic2
 id m3_side_sheet
 id map
 id marquee
@@ -3149,6 +3155,7 @@ id mtrl_picker_text_input_range_start
 id mtrl_picker_title_text
 id mtrl_view_tag_bottom_padding
 id multiply
+id navi
 id navigation_bar_item_active_indicator_view
 id navigation_bar_item_icon_container
 id navigation_bar_item_icon_view
@@ -3297,7 +3304,6 @@ id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
 id tag_window_insets_animation_callback
 id text
-id text1
 id text2
 id textEnd
 id textSpacerNoButtons

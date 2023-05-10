@@ -86,6 +86,11 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         invalidate()
     }
 
+    fun clearLine(){
+        lineArray.clear()
+        lineColorArray.clear()
+    }
+
     // init 부분에서 이 부분을 지우고 실행해봤는데 마커가 그려지지 않았음. 추후 해석 필.
     private fun initialize() {
         val density = resources.displayMetrics.densityDpi.toFloat()
