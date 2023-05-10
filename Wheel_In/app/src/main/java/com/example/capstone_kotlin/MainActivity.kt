@@ -332,7 +332,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             var root = dijk!!.findShortestPath(dijk!!.makeGraph())
             for (i in root)
             {
-                var pointt = db!!.findCrosstoID(i.first.toInt(), nodesCross!!)
+                var pointt = db!!.findCrosstoID(i.first, nodesCross!!)
                 map?.addLine(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), Color.GREEN)
 
                 if (i.second != "start" && i.second != "end" && i.second != "place") {
@@ -356,14 +356,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             navi_img1.visibility = View.GONE
             navi_img2.visibility = View.GONE
 
-            navi.setOnTouchListener { _, event ->
-                // frameLayout을 터치할 때 이벤트가 발생하면 true를 반환하여
-                // 해당 이벤트를 소비하고, map의 onTouchEvent를 호출하지 않도록 합니다.
-                true
-            }
-
             navi_start.setOnClickListener {
                 navi.setBackgroundResource(R.drawable.white_space)
+
+                navi.setOnTouchListener { _, event ->
+                    // frameLayout을 터치할 때 이벤트가 발생하면 true를 반환하여
+                    // 해당 이벤트를 소비하고, map의 onTouchEvent를 호출하지 않도록 합니다.
+                    true
+                }
 
                 navi_start.visibility = View.GONE
 
@@ -378,8 +378,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                 map?.clearPin()
 
+                navi.setBackgroundResource(0)
+
                 startId = null
                 endId = null
+
+                navi_start.visibility = View.VISIBLE
 
                 navi.visibility = View.GONE
             }
