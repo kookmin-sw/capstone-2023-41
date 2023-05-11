@@ -1,5 +1,6 @@
 package com.example.capstone_kotlin
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -14,12 +15,11 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
-        val scanBtn = findViewById<Button>(R.id.scanBtn) as Button
-        scanBtn.setOnClickListener(this)
+        scanCode()
     }
 
     override fun onClick(p0: View?) {
-        scanCode()
+//        scanCode()
     }
 
     private fun scanCode() {
@@ -39,25 +39,14 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents != null) {
-                val intent : Intent = Intent(this, MapActivity::class.java);
-                intent.putExtra("QRdata", result.contents)
-                startActivity(intent)
-                //ResultActivity 내에서 ...
-                //Intent intent = getIntent();
-                //String myData = intent.getStringExtra("QRdata");
-
-                val builder = AlertDialog.Builder(this)
-                builder.setMessage(result.contents)
-                builder.setTitle("Scanning Result")
-                builder.setPositiveButton(
-                    "Scan Again"
-                ) { dialogInterface, i -> scanCode() }.setNegativeButton(
-                    "finish"
-                ) { dialogInterface, i -> finish() }
-                val dialog = builder.create()
-                dialog.show()
-            } else {
-                //Toast.makeText(this, "No Results", Toast.LENGTH_LONG).show()
+                // MainActivity로 결과 전송을 위한 Intent 객체 생성
+                val ToMainIntent : Intent = Intent(this@ScanActivity, MainActivity::class.java);
+                ToMainIntent.putExtra("QRdata", result.contents)
+                setResult(Activity.RESULT_OK, ToMainIntent)
+                finish()
+            } else {    // 뒤로가기 버튼을 누르는 등 아무것도 촬영 안한 경우
+                Toast.makeText(this, "QR코드에 아무것도 담겨있지 않아요.", Toast.LENGTH_SHORT).show()
+                finish()
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

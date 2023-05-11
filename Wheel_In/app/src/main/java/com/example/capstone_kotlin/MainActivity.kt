@@ -30,20 +30,35 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var searchView1: SearchView
     private lateinit var searchView2: SearchView
 
-    private var isButtonsVisible = false
+    // 정보창 및 표시될 사진, 지명, 접근성
+    private lateinit var info: FrameLayout
+    private lateinit var infoPic1: ImageView
+    private lateinit var infoPic2: ImageView
+    private lateinit var infoText1: TextView
+    private lateinit var infoText2: TextView
+
+    // QR 촬영으로 값 받아올 변수
+    private var returnedData: String? = null
+    private var id: DataBaseHelper.PlaceNode? = null
 
     // MapActivity 선언부
-    var map: PinView? = null
-    var gestureDetector: GestureDetector? = null
+    private lateinit var map: PinView
 
-    var db : DataBaseHelper? = null
+    // 터치 처리
+    private lateinit var gestureDetector: GestureDetector
 
-    var floorsIndoor: List<DataBaseHelper.IndoorFloor>? = null
-    var nodesPlace: List<DataBaseHelper.PlaceNode>? = null
-    var nodesCross: List<DataBaseHelper.CrossNode>? = null
+    // DB
+    private lateinit var db: DataBaseHelper
 
-    var dijk : Dijkstra? = null
-    var ratio : Float? = null
+    private lateinit var floorsIndoor: List<DataBaseHelper.IndoorFloor>
+    private lateinit var nodesPlace: List<DataBaseHelper.PlaceNode>
+    private lateinit var nodesCross: List<DataBaseHelper.CrossNode>
+
+    // 길찾기
+    private lateinit var dijk: Dijkstra
+
+    // 지도 좌표 비율
+    var ratio = 0F
 
     // mapvar
     var startId: String? = null;
@@ -66,27 +81,27 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         val spinner: Spinner = findViewById(R.id.spinner)
 
         // 정보창
-        var info = findViewById<FrameLayout>(R.id.info)
+        info = findViewById(R.id.info)
 
         // 정보창에 띄울 정보들
-        var infoText1 = findViewById<TextView>(R.id.text1)
-        var infoText2 = findViewById<TextView>(R.id.text2)
+        infoText1 = findViewById(R.id.text1)
+        infoText2 = findViewById(R.id.text2)
 
-        var infoPic1 = findViewById<ImageView>(R.id.infoPic1)
-        var infoPic2 = findViewById<ImageView>(R.id.infoPic2)
+        infoPic1 = findViewById(R.id.infoPic1)
+        infoPic2 = findViewById(R.id.infoPic2)
 
         // 출발, 도착 버튼
         var start = findViewById<Button>(R.id.start)
         var end = findViewById<Button>(R.id.end)
 
         // 지도 크기 제한
-        map!!.maxScale = 0.5f
+        map!!.maxScale = 1f
 
         db = DataBaseHelper(this)
 
-        floorsIndoor = db!!.getFloorsIndoor()
-        nodesPlace = db!!.getNodesPlace()
-        nodesCross = db!!.getNodesCross()
+        floorsIndoor = db.getFloorsIndoor()
+        nodesPlace = db.getNodesPlace()
+        nodesCross = db.getNodesCross()
 
         // QR 촬영 버튼 활성화.
         qrButton.setOnClickListener{
@@ -122,10 +137,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 if (query.isEmpty() && searchView2.query.isEmpty()) {
                     searchView2.visibility = View.GONE
                 } else {
-                    if(query == "123"){
-                        info.visibility = View.VISIBLE
-                        isButtonsVisible = true
-                    }
                     searchView2.visibility = View.VISIBLE
                 }
                 return true
@@ -158,106 +169,57 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             true
         }
 
-        var touchTime = 0L
+        // 출발 버튼 누르면 searchView1 채우기
+        start.setOnClickListener{
+            searchView1.setQuery(id?.name, true)
+            if (startId != null) {
+                map.clearPin()
+                map.addPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.pushpin_blue)
+            }
+            startId = id?.id.toString()
+            Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
+            mapInit()
+            info.visibility = View.GONE
+        }
 
+        // 도착 버튼 누르면 searchView2 채우기
+        end.setOnClickListener{
+            searchView2.setQuery(id!!.name, true)
+            if (endId != null) {
+                map?.clearPin()
+                map?.addPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+            }
+            endId = id!!.id.toString()
+            Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
+            mapInit()
+            info.visibility = View.GONE
+        }
 
+        // 화면 비율
+        ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
 
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
 
                 var pointt = map?.viewToSourceCoord(e.x, e.y);
-                if (check_area(pointt!!.x, pointt!!.y) != null)
+
+                var x = pointt!!.x/ratio
+                var y = pointt!!.y/ratio
+
+                id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
+
+                if (id != null)
                 {
-                    val check = check_area(pointt!!.x, pointt!!.y)
-
-                    info.visibility = View.VISIBLE
-
-                    infoText1.text = "${check!!.name}"
-
-                    if (check!!.access == 0) {
-                        infoText2.setBackgroundColor(Color.RED)
-                    }
-                    else if (check!!.access == 1) {
-                        infoText2.setBackgroundColor(Color.YELLOW)
-                    }
-                    else {
-                        infoText2.setBackgroundColor(Color.GREEN)
-                    }
-
-                    infoPic1.setImageBitmap(check!!.img1)
-                    infoPic2.setImageBitmap(check!!.img2)
-
-                    // 출발 버튼 누르면 searchView1 채우기
-                    start.setOnClickListener{
-                        searchView1.setQuery(check!!.name, true)
-
-                        if (startId != null) {
-                            map?.clearPin()
-                            map?.addPin((PointF(check!!.x.toFloat()*ratio!!, check!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
-                        }
-                        startId = check!!.id.toString()
-                        Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
-                        mapInit()
-                        info.visibility = View.GONE
-                    }
-
-                    // 도착 버튼 누르면 searchView2 채우기
-                    end.setOnClickListener{
-                        searchView2.setQuery(check!!.name, true)
-                        if (endId != null) {
-                            map?.clearPin()
-                            map?.addPin((PointF(check!!.x.toFloat()*ratio!!, check!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
-                        }
-
-                        endId = check!!.id.toString()
-                        Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
-                        mapInit()
-                        info.visibility = View.GONE
-                    }
+                    showInfo(id)
                 }
                 else if (info.visibility == View.VISIBLE) {
                     info.visibility = View.GONE
                 }
-                /*
-                map.setOnTouchListener { view, event ->
-                    when (event.action) {
-                        MotionEvent.ACTION_DOWN -> {
-                            val x = event.x
-                            val y = event.y
-                            val outPoint = IntArray(2)
-                            map.getLocationOnScreen(outPoint)
-                            val imageX = x - outPoint[0]
-                            val imageY = y - outPoint[1]
-                            // 클릭한 좌표값 사용하기
-//                    Toast.makeText(this, "x: $imageX, y: $imageY", Toast.LENGTH_SHORT).show()
-                            if (imageX < 500f && imageY < 200f){
-                                if (isButtonsVisible) {
-                                    info.visibility = View.GONE
-                                } else {
-                                    info.visibility = View.VISIBLE
-                                }
-                                isButtonsVisible = !isButtonsVisible
-                                infoPic1.setImageResource(R.drawable.pushpin_blue)
-                                infoPic2.setImageResource(R.drawable.pushpin_blue)
-                            }
-                            else if(imageX < 1000f && imageY < 500f){
-                                if (isButtonsVisible) {
-                                    info.visibility = View.GONE
-                                } else {
-                                    info.visibility = View.VISIBLE
-                                }
-                                isButtonsVisible = !isButtonsVisible
-                                infoPic1.setImageResource(R.drawable.duck)
-                                infoPic2.setImageResource(R.drawable.duck)
-                            }
-                        }
-                    }
-                    false
-                }*/
 
                 return true
             }
         })
+
         map?.setOnTouchListener(View.OnTouchListener { view, motionEvent -> // OnTouchListner로 터치 이벤트 감지
             gestureDetector!!.onTouchEvent( // gestureDectector로 터치 이벤트 처리
                 motionEvent
@@ -281,8 +243,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
-
-
 
         // MapActivity 연결부
 
@@ -316,12 +276,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         var navi_start = findViewById<Button>(R.id.navi_start)
         var navi_end = findViewById<Button>(R.id.navi_end)
 
-        var intent : Intent = getIntent()
-        var qrData : String? = intent!!.getStringExtra("QRdata")
-        if (qrData != null)
+        if (returnedData != null)
         {
             scid = db!!.findCrosstoID(startId!!.toInt(), nodesCross!!)
-            intent.removeExtra("QRdata")
         }
         else if (startId != null) {
             scid = db!!.findCrosstoID(startId!!.toInt(), nodesCross!!)
@@ -346,14 +303,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                 if (i.second != "start" && i.second != "end" && i.second != "place") {
                     map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.crossroad)
-                }
-
-                if (i.second == "east") {
-                    navi_img1.setImageBitmap(pointt!!.imgEast)
-                }
-
-                if (i.second == "south") {
-                    navi_img2.setImageBitmap(pointt!!.imgSouth)
                 }
             }
 
@@ -409,7 +358,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val returnedData = data?.getStringExtra("QRdata")
             Toast.makeText(this, returnedData, Toast.LENGTH_SHORT).show()
-            searchView1.setQuery(returnedData, false)
+            id = db.findPlacetoID(returnedData!!.toInt(), nodesPlace)
+            showInfo(id)
         }
     }
 
@@ -451,11 +401,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     // 입력된 x,y 좌표 값에 대한 처리 함수 예제
     private fun check_area(x: Float, y: Float) : DataBaseHelper.PlaceNode?
     {
-        var testX = x/ratio!!
-        var testY = y/ratio!!
+        var id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
 
-        var msg2 = testX.toString() + ":" + testY.toString()
-        var id = db!!.findPlacetoXY(testX.toInt(), testY.toInt(), nodesPlace!!)
         if (id != null)
         {
             //map?.clearPin();
@@ -496,6 +443,37 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
 
         return null
+    }
+
+    fun showInfo(id: DataBaseHelper.PlaceNode?) {
+        if (id != null) {
+            // 정보 사진
+            infoPic1.setImageBitmap(id?.img1)
+            infoPic2.setImageBitmap(id?.img2)
+
+            // 접근성
+            if(id?.access == 0){
+                infoText2.setBackgroundColor(Color.RED)
+            }
+            if(id?.access == 1){
+                infoText2.setBackgroundColor(Color.YELLOW)
+            }
+            if(id?.access == 2){
+                infoText2.setBackgroundColor(Color.GREEN)
+            }
+
+            // 지명
+            infoText1.setText(id?.name)
+            info.visibility = View.VISIBLE
+
+            map.animateScaleAndCenter(1f,PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio))?.start()
+            map.addPin(PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+            return
+        }
+        else{
+            info.visibility = View.GONE
+            map.clearPin()
+        }
     }
 }
 
