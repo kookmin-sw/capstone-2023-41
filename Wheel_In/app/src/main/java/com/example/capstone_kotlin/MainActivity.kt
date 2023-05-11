@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     var gestureDetector: GestureDetector? = null
 
     var db : DataBaseHelper? = null
+
+    var floorsIndoor: List<DataBaseHelper.IndoorFloor>? = null
     var nodesPlace: List<DataBaseHelper.PlaceNode>? = null
     var nodesCross: List<DataBaseHelper.CrossNode>? = null
 
@@ -81,6 +83,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         map!!.maxScale = 0.5f
 
         db = DataBaseHelper(this)
+
+        floorsIndoor = db!!.getFloorsIndoor()
         nodesPlace = db!!.getNodesPlace()
         nodesCross = db!!.getNodesCross()
 
@@ -281,7 +285,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
 
         // MapActivity 연결부
-        map?.setImage(ImageSource.resource(R.drawable.mirae_4f))
+
+        val drawableName = db!!.findMaptoFloor(4, floorsIndoor!!)
+        val drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
+        map?.setImage(ImageSource.resource(drawableId))
+
+        // map?.setImage(ImageSource.resource(R.drawable.mirae_4ff))
 
         // 그려졌을때 실행되는 함수
         map?.viewTreeObserver!!.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {

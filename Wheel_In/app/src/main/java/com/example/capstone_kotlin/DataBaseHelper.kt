@@ -56,13 +56,35 @@ class DataBaseHelper(private val context: Context) :
         }
     }
 
-    data class PlaceNode(val idx: Int, val id: Int, val name: String, val x: Int, val y: Int,
-                         val access: Int, val img1: Bitmap?, val img2: Bitmap?)
-    data class CrossNode(val idx: Int, val id: Int, val x: Int, val y: Int, val nodes: List<Triple<Int, Int, String>>,
+    data class IndoorFloor(val placeid: Int, val floorid: Int, val mapname: String)
+
+    data class PlaceNode(val placeid: Int, val id: Int, val name: String, val checkplace: Int,
+                         val x: Int, val y: Int, val access: Int, val img1: Bitmap?, val img2: Bitmap?)
+    data class CrossNode(val placeid: Int, val id: Int, val x: Int, val y: Int, val nodes: List<Triple<Int, Int, String>>,
                          val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
 
+    val floorList = mutableListOf<IndoorFloor>()
     val placeList = mutableListOf<PlaceNode>()
     val crossList = mutableListOf<CrossNode>()
+
+    fun getFloorsIndoor(): List<IndoorFloor> {
+        val db = readableDatabase
+        val floorsIndoorCursor = db.rawQuery("SELECT * FROM indoor_floors", null)
+
+        floorsIndoorCursor?.let {
+            while (it.moveToNext()) {
+                val placeid = it.getInt(0)
+                val floorid = it.getInt(1)
+                val mapname = it.getString(2)
+
+                floorList.add(IndoorFloor(placeid, floorid, mapname))
+            }
+
+            it.close()
+        }
+
+        return floorList
+    }
 
     fun getNodesPlace(): List<PlaceNode> {
         val db = readableDatabase
@@ -70,20 +92,21 @@ class DataBaseHelper(private val context: Context) :
 
         nodesPlaceCursor?.let {
             while (it.moveToNext()) {
-                val idx = it.getInt(0)
+                val placeid = it.getInt(0)
                 val id = it.getInt(1)
                 val name = it.getString(2)
-                val x = it.getInt(3)
-                val y = it.getInt(4)
-                val access = it.getInt(5)
+                val checkplace = it.getInt(3)
+                val x = it.getInt(4)
+                val y = it.getInt(5)
+                val access = it.getInt(6)
 
-                val bytes1: ByteArray = it.getBlob(6)
-                val bytes2: ByteArray = it.getBlob(7)
+                val bytes1: ByteArray = it.getBlob(7)
+                val bytes2: ByteArray = it.getBlob(8)
 
                 val img1: Bitmap? = BitmapFactory.decodeByteArray(bytes1, 0, bytes1.size)
                 val img2: Bitmap? = BitmapFactory.decodeByteArray(bytes2, 0, bytes2.size)
 
-                placeList.add(PlaceNode(idx, id, name, x, y, access, img1, img2))
+                placeList.add(PlaceNode(placeid, id, name, checkplace, x, y, access, img1, img2))
             }
 
             it.close()
@@ -98,7 +121,7 @@ class DataBaseHelper(private val context: Context) :
 
         nodesCrossCursor?.let {
             while (it.moveToNext()) {
-                val idx = it.getInt(0)
+                val placeid = it.getInt(0)
                 val id = it.getInt(1)
                 val x = it.getInt(2)
                 val y = it.getInt(3)
@@ -136,7 +159,7 @@ class DataBaseHelper(private val context: Context) :
                     imgNorth = BitmapFactory.decodeByteArray(bytesNorth, 0, bytesNorth.size)
                 }
 
-                crossList.add(CrossNode(idx, id, x, y, nodes, imgEast, imgWest, imgSouth, imgNorth))
+                crossList.add(CrossNode(placeid, id, x, y, nodes, imgEast, imgWest, imgSouth, imgNorth))
             }
 
             it.close()
@@ -169,6 +192,16 @@ class DataBaseHelper(private val context: Context) :
         for (i in list) {
             if (i.id == id) {
                 return i
+            }
+        }
+
+        return null
+    }
+
+    fun findMaptoFloor(floorid: Int, list: List<IndoorFloor>): String? {
+        for (i in list) {
+            if (i.floorid == floorid) {
+                return i.mapname
             }
         }
 
