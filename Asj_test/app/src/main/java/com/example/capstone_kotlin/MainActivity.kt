@@ -249,36 +249,36 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         if(returnedData == null){
             return
         }
-//        else if (returnedData != null)
-//        {
-//            scid = db.findCrosstoID(startId.toInt(), nodesCross)
+        else if (returnedData != null)
+        {
+            scid = db.findCrosstoID(startId.toInt(), nodesCross)
+            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+            return
+        }
+        if(startId != null){
+            scid = db.findCrosstoID(startId.toInt(), nodesCross)
+            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+        }
+        else if(endId != null){
+            ecid = db.findCrosstoID(endId.toInt(), nodesCross)
+            map?.addPin(PointF(ecid!!.x.toFloat()*ratio!!, ecid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
+        }
+        if (startId != null && endId != null)
+        {
+//            map.clearPin();
 //            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-//            return
-//        }
-//        if(startId != null){
-//            scid = db.findCrosstoID(startId.toInt(), nodesCross)
-//            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-//        }
-//        else if(endId != null){
-//            ecid = db.findCrosstoID(endId.toInt(), nodesCross)
-//            map?.addPin(PointF(ecid!!.x.toFloat()*ratio!!, ecid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
-//        }
-//        if (startId != null && endId != null)
-//        {
-////            map.clearPin();
-////            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-////            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-//            dijk = Dijkstra(nodesCross, startId.toInt(), endId.toInt())
-//            var root = dijk.findShortestPath(dijk.makeGraph())
-//            for (i in root)
-//            {
-//                var pointt = db.findCrosstoID(i.first.toInt(), nodesCross)
-//                map.addLine(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), Color.GREEN)
-//                if (i.second != "start" && i.second != "end" && i.second != "place") {
-//                    map.addPin(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-//                }
-//            }
-//        }
+//            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+            dijk = Dijkstra(nodesCross, startId.toInt(), endId.toInt())
+            var root = dijk.findShortestPath(dijk.makeGraph())
+            for (i in root)
+            {
+                var pointt = db.findCrosstoID(i.first.toInt(), nodesCross)
+                map.addLine(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), Color.GREEN)
+                if (i.second != "start" && i.second != "end" && i.second != "place") {
+                    map.addPin(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                }
+            }
+        }
     }
 
 

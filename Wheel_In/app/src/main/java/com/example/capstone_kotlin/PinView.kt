@@ -19,6 +19,14 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     var w: Float? = null
     var h: Float? = null
 
+    private var startPinArray = ArrayList<PointF>()
+    private var startFixedArray = ArrayList<Int>() // 0 : not fix, 1 : fix
+    private var startImageArray = ArrayList<Int>()
+
+    private var endPinArray = ArrayList<PointF>()
+    private var endFixedArray = ArrayList<Int>() // 0 : not fix, 1 : fix
+    private var endImageArray = ArrayList<Int>()
+
     /**
      * 지도(기본 이미지)위에 기본 Pin을 추가하고 나머지는 초기화합니다.
      * @param nPin Pin 이 표시될 좌표값입니다.
@@ -49,6 +57,22 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         invalidate()
     }
 
+    fun addStartPin(nPin: PointF?, fix: Int, imageID: Int?)
+    {
+        startPinArray.add(nPin!!)
+        startFixedArray.add(fix!!)
+        startImageArray.add(imageID!!)
+        invalidate()
+    }
+
+    fun addEndPin(nPin: PointF?, fix: Int, imageID: Int?)
+    {
+        endPinArray.add(nPin!!)
+        endFixedArray.add(fix!!)
+        endImageArray.add(imageID!!)
+        invalidate()
+    }
+
     /**
      * 지도(기본 이미지)위에 표시할 Point를 추가합니다. 이 Point들은 2개 이상일 경우 연결되어 선을 표시합니다.
      * @param point PointF 형식의 좌표입니다.
@@ -71,6 +95,24 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         imageArray = arrayListOf()
         lineArray = arrayListOf()
         lineColorArray = arrayListOf()
+        invalidate()
+    }
+    fun clearStartPin()
+    {
+        startPinArray.clear()
+        startFixedArray.clear()
+        startImageArray.clear()
+        lineArray.clear()
+        lineColorArray.clear()
+        invalidate()
+    }
+    fun clearEndPin()
+    {
+        endPinArray.clear()
+        endFixedArray.clear()
+        endImageArray.clear()
+        lineArray.clear()
+        lineColorArray.clear()
         invalidate()
     }
 
@@ -120,6 +162,50 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
             var pin = pinArray.get(i)
             var fix = fixedArray.get(i)
             var imageId = imageArray.get(i)
+            sourceToViewCoord(pin, vPin)
+            var image = BitmapFactory.decodeResource(this.resources, imageId)
+            w = density / 420f * image!!.getWidth()
+            h = density / 420f * image!!.getHeight()
+
+            if(fix == 1) // 확대 축소에 따라 크기가 변하지 않음
+            {
+                image = Bitmap.createScaledBitmap(image!!, (w!!).toInt(), (h!!).toInt(), true)
+            }
+            else // 확대 축소에 따라 크기가 변함
+            {
+                image= Bitmap.createScaledBitmap(image!!, (w!!*s).toInt(), (h!!*s).toInt(), true)
+            }
+            val vX = vPin.x - image!!.width / 2 //(/2가 없는 경우 해당 좌표기준 좌측 위로 이미지가 생성됨)
+            val vY = vPin.y - image!!.height
+            canvas.drawBitmap(image!!, vX, vY, paint)
+        }
+
+        for (i in startPinArray.indices){
+            var pin = startPinArray.get(i)
+            var fix = startFixedArray.get(i)
+            var imageId = startImageArray.get(i)
+            sourceToViewCoord(pin, vPin)
+            var image = BitmapFactory.decodeResource(this.resources, imageId)
+            w = density / 420f * image!!.getWidth()
+            h = density / 420f * image!!.getHeight()
+
+            if(fix == 1) // 확대 축소에 따라 크기가 변하지 않음
+            {
+                image = Bitmap.createScaledBitmap(image!!, (w!!).toInt(), (h!!).toInt(), true)
+            }
+            else // 확대 축소에 따라 크기가 변함
+            {
+                image= Bitmap.createScaledBitmap(image!!, (w!!*s).toInt(), (h!!*s).toInt(), true)
+            }
+            val vX = vPin.x - image!!.width / 2 //(/2가 없는 경우 해당 좌표기준 좌측 위로 이미지가 생성됨)
+            val vY = vPin.y - image!!.height
+            canvas.drawBitmap(image!!, vX, vY, paint)
+        }
+
+        for (i in endPinArray.indices){
+            var pin = endPinArray.get(i)
+            var fix = endFixedArray.get(i)
+            var imageId = endImageArray.get(i)
             sourceToViewCoord(pin, vPin)
             var image = BitmapFactory.decodeResource(this.resources, imageId)
             w = density / 420f * image!!.getWidth()

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent // Intent는 액티비티간 데이터를 전달하는데 사용된다.
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.drawable.BitmapDrawable
@@ -60,7 +61,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // mapvar
     var startId: String? = null;
-    var endId: String? = null;
+    var endId: String? = null
+
+    var interaction: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) { // onCreate 함수를 오버라이드. 이 함수는 액티비티가 생성될 때 호출됨.
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
@@ -167,11 +170,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 출발 버튼 누르면 searchView1 채우기
         start.setOnClickListener{
             searchView1.setQuery(id?.name, true)
-            if (startId != null) {
-                map.clearPin()
-                map.addPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.pushpin_blue)
-            }
             startId = id?.id.toString()
+            map.clearStartPin()
+            map.clearPin()
+            map.addStartPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.pushpin_blue)
             Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
             mapInit()
             info.visibility = View.GONE
@@ -179,12 +181,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 도착 버튼 누르면 searchView2 채우기
         end.setOnClickListener{
-            searchView2.setQuery(id!!.name, true)
-            if (endId != null) {
-                map?.clearPin()
-                map?.addPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
-            }
-            endId = id!!.id.toString()
+            searchView2.setQuery(id?.name, true)
+            map.clearPin()
+            map.clearEndPin()
+            map.addEndPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+            endId = id?.id.toString()
             Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
             mapInit()
             info.visibility = View.GONE
@@ -194,24 +195,27 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-
-                var pointt = map.viewToSourceCoord(e.x, e.y);
-                var x = pointt!!.x/ratio
-                var y = pointt!!.y/ratio
-                id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
-                if (id != null)
-                {
-                    showInfoTap(id)
+                if(interaction){
+                    var pointt = map.viewToSourceCoord(e.x, e.y);
+                    var x = pointt!!.x/ratio
+                    var y = pointt!!.y/ratio
+                    id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
+                    if (id != null)
+                    {
+                        showInfo(id)
+                    }
+                    else if(id == null){
+                        showInfo(null)
+                    }
+                    return true
                 }
-                else if (info.visibility == View.VISIBLE) {
-                    info.visibility = View.GONE
+                else{
+                    return false
                 }
-
-                return true
             }
         })
-        map?.setOnTouchListener(View.OnTouchListener { view, motionEvent -> // OnTouchListner로 터치 이벤트 감지
-            gestureDetector!!.onTouchEvent( // gestureDectector로 터치 이벤트 처리
+        map.setOnTouchListener(View.OnTouchListener { view, motionEvent -> // OnTouchListner로 터치 이벤트 감지
+            gestureDetector.onTouchEvent( // gestureDectector로 터치 이벤트 처리
                 motionEvent
             )
         })
@@ -237,78 +241,52 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
 
         // MapActivity 연결부
-        map?.setImage(ImageSource.resource(R.drawable.mirae_4f))
+        map.setImage(ImageSource.resource(R.drawable.mirae_4f))
 
         // 그려졌을때 실행되는 함수
-        map?.viewTreeObserver!!.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                mapInit();
-                map?.viewTreeObserver!!.removeOnGlobalLayoutListener(this)
-            }
-        })
+//        map.viewTreeObserver!!.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
+//            override fun onGlobalLayout() {
+//                mapInit();
+//                map.viewTreeObserver!!.removeOnGlobalLayoutListener(this)
+//            }
+//        })
     }
 
     fun mapInit()
     {
-        ratio = map?.getResources()!!.getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
-
-        var scid: DataBaseHelper.CrossNode? = null
-        var ecid: DataBaseHelper.CrossNode? = null
+        var scid = db.findCrosstoID(startId?.toInt(), nodesCross)
+        var ecid = db.findCrosstoID(endId?.toInt(), nodesCross)
 
         var navi = findViewById<FrameLayout>(R.id.navi)
-
-        var navi_img1 = findViewById<ImageView>(R.id.navi_img1)
-        var navi_img2 = findViewById<ImageView>(R.id.navi_img2)
 
         var navi_start = findViewById<Button>(R.id.navi_start)
         var navi_end = findViewById<Button>(R.id.navi_end)
 
-        if (returnedData != null)
-        {
-            scid = db!!.findCrosstoID(startId!!.toInt(), nodesCross!!)
-        }
-        else if (startId != null) {
-            scid = db!!.findCrosstoID(startId!!.toInt(), nodesCross!!)
-            //map?.addPin(PointF(cid!!.x.toFloat()*ratio!!, cid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
-        }
-        if (endId != null)
-        {
-            ecid = db!!.findCrosstoID(endId!!.toInt(), nodesCross!!)
-            //map?.addPin(PointF(cid!!.x.toFloat()*ratio!!, cid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
-        }
+        var navi_layout = findViewById<LinearLayout>(R.id.navi_layout)
+
         if (startId != null && endId != null)
         {
-            map?.clearPin();
-            map?.addPin(PointF(scid!!.x.toFloat()*ratio!!, scid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
-            map?.addPin(PointF(ecid!!.x.toFloat()*ratio!!, ecid!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
-            dijk = Dijkstra(nodesCross!!, startId!!.toInt(), endId!!.toInt())
-            var root = dijk!!.findShortestPath(dijk!!.makeGraph())
+            interaction = false
+            map.clearStartPin()
+            map.clearEndPin()
+            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
+            dijk = Dijkstra(nodesCross, startId!!.toInt(), endId!!.toInt())
+            var root = dijk.findShortestPath(dijk.makeGraph())
             for (i in root)
             {
-                var pointt = db!!.findCrosstoID(i.first, nodesCross!!)
-                map?.addLine(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), Color.GREEN)
+                var pointt = db.findCrosstoID(i.first, nodesCross)
+                map.addLine(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), Color.GREEN)
 
                 if (i.second != "start" && i.second != "end" && i.second != "place") {
-                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.crossroad)
+                    map.addPin(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), 1, R.drawable.crossroad)
                 }
 
-                if (i.second == "east") {
-                    navi_img1.setImageBitmap(pointt!!.imgEast)
-                }
-
-                if (i.second == "south") {
-                    navi_img2.setImageBitmap(pointt!!.imgSouth)
-                }
             }
 
-            startId = ""
-            endId = ""
-
             navi.visibility = View.VISIBLE
-
-            navi_img1.visibility = View.GONE
-            navi_img2.visibility = View.GONE
-
+            navi_layout.visibility = View.GONE
             navi_start.setOnClickListener {
                 navi.setBackgroundResource(R.drawable.white_space)
 
@@ -319,9 +297,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 }
 
                 navi_start.visibility = View.GONE
-
-                navi_img1.visibility = View.VISIBLE
-                navi_img2.visibility = View.VISIBLE
+                navi_layout.visibility = View.VISIBLE
             }
 
             navi_end.setOnClickListener{
@@ -329,12 +305,15 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 searchView2.setQuery("", true)
                 searchView1.setQuery("", true)
 
-                map?.clearPin()
-
-                navi.setBackgroundResource(0)
+                map.clearPin()
+                map.clearStartPin()
+                map.clearEndPin()
 
                 startId = null
                 endId = null
+
+                interaction = true
+                navi.setBackgroundResource(0)
 
                 navi_start.visibility = View.VISIBLE
 
@@ -346,16 +325,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
 
     // QR 촬영 후 데이터 값 받아옴.
-    // 2023-05-27 15시 기준 현재 받아온 데이터 값을 searchView1 에 넣음.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             returnedData = data?.getStringExtra("QRdata")
             Toast.makeText(this, returnedData, Toast.LENGTH_SHORT).show()
-            var test = db.findPlacetoID(returnedData!!.toInt(), nodesPlace)
-            showInfoTap(test)
-            startId = returnedData
+            id = db.findPlacetoID(returnedData!!.toInt(), nodesPlace)
+            showInfo(id)
         }
     }
 
@@ -392,94 +369,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         alertDialog.show()
     }
 
-
-    // Map Func
-    // 입력된 x,y 좌표 값에 대한 처리 함수 예제
-    private fun check_area(x: Float, y: Float) : DataBaseHelper.PlaceNode?
-    {
-        var testX = x/ratio!!
-        var testY = y/ratio!!
-
-        var id = db!!.findPlacetoXY(testX.toInt(), testY.toInt(), nodesPlace!!)
-        if (id != null)
-        {
-            //map?.clearPin();
-            if (startId == "") {
-                return null
-            }
-
-            if (startId != null) {
-                map?.clearPin()
-                map?.addPin((PointF(db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
-            }
-            else if (endId != null) {
-                map?.clearPin()
-                map?.addPin((PointF(db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
-            }
-            else {
-                map?.clearPin()
-            }
-
-            map?.addPin(PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!), 1, R.drawable.pushpin_blue)
-            return id
-        }
-
-        if (startId == "") {
-            return null
-        }
-
-        if (startId != null) {
-            map?.clearPin()
-            map?.addPin((PointF(db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(startId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
-        }
-        else if (endId != null) {
-            map?.clearPin()
-            map?.addPin((PointF(db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.x.toFloat()*ratio!!, db!!.findPlacetoID(endId!!.toInt(), nodesPlace!!)!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
-        }
-        else {
-            map?.clearPin()
-        }
-
-        return null
-    }
-
-    // 현재 QR 에서 강의실 호수 숫자만 리턴하므로 그에 대한 테스트용 함수.
-    fun showInfoQR(id: String?){
-        if (id != null) {
-            for (i in nodesPlace!!.indices) {
-                if (nodesPlace[i].id == id.toInt()) {
-                    // 정보 사진
-                    infoPic1.setImageBitmap(nodesPlace[i].img1)
-                    infoPic2.setImageBitmap(nodesPlace[i].img2)
-                    // 접근성
-                    if (nodesPlace[i].access == 0) {
-                        infoText2.setBackgroundColor(Color.RED)
-                    }
-                    else if (nodesPlace[i].access == 1) {
-                        infoText2.setBackgroundColor(Color.YELLOW)
-                    }
-                    else if (nodesPlace[i].access == 2) {
-                        infoText2.setBackgroundColor(Color.GREEN)
-                    }
-                    // 지명
-                    infoText1.setText(nodesPlace[i].name + nodesPlace[i].id)
-                    info.visibility = View.VISIBLE
-
-
-                    map.animateScaleAndCenter(1f,PointF(nodesPlace[i].x.toFloat()*ratio, nodesPlace[i].y.toFloat()*ratio))?.start()
-                    map.addPin(PointF(nodesPlace[i].x.toFloat()*ratio, nodesPlace[i].y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-                    return
-                }
-            }
-        }
-        else{
-            info.visibility = View.GONE
-        }
-    }
-
-    // QR에서 DB 정보를 받아올 경우.
-    // 추후 수정 필요 (QR에서 받아오는 데이터는 스트링 형태이므로 문자열 슬라이싱 및 타입 변환 필요)
-    fun showInfoTap(id: DataBaseHelper.PlaceNode?){
+    // QR 촬영 및 터치로 값 받아오기
+    fun showInfo(id: DataBaseHelper.PlaceNode?){
         if (id != null) {
             // 정보 사진
             infoPic1.setImageBitmap(id?.img1)
