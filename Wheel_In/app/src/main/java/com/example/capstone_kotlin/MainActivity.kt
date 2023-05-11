@@ -301,8 +301,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 var pointt = db!!.findCrosstoID(i.first, nodesCross!!)
                 map?.addLine(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), Color.GREEN)
 
-                if (i.second != "start" && i.second != "end" && i.second != "place") {
-                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.crossroad)
+                if (i.third == "east") {
+                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.east_arrow)
+                }
+                else if (i.third == "west") {
+                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.west_arrow)
+                }
+                else if (i.third == "south") {
+                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.south_arrow)
+                }
+                else if (i.third == "north") {
+                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.north_arrow)
                 }
             }
 
