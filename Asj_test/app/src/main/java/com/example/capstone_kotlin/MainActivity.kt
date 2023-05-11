@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var infoPic2: ImageView
     private lateinit var gestureDetector: GestureDetector
 
-    private lateinit var loadInfo: FrameLayout
+    private lateinit var roadInfo: FrameLayout
 
     private lateinit var db: DataBaseHelper
     private lateinit var nodesPlace: List<DataBaseHelper.PlaceNode>
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         navi = findViewById(R.id.navi)
 
         // 경로 안내 화면
-        loadInfo = findViewById(R.id.loadInfo)
+        roadInfo = findViewById(R.id.roadInfo)
 
         // 화면 비율
         ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 길찾기 버튼 활성화.
         navi.setOnClickListener{
             // 구현 필요.
-            loadInfo.visibility = View.VISIBLE
+            roadInfo.visibility = View.VISIBLE
         }
 
         // QR 촬영 버튼 활성화.
@@ -355,10 +355,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     if (nodesPlace[i].access == 0) {
                         infoText2.setBackgroundColor(Color.RED)
                     }
-                    if (nodesPlace[i].access == 1) {
+                    else if (nodesPlace[i].access == 1) {
                         infoText2.setBackgroundColor(Color.YELLOW)
                     }
-                    if (nodesPlace[i].access == 2) {
+                    else if (nodesPlace[i].access == 2) {
                         infoText2.setBackgroundColor(Color.GREEN)
                     }
                     // 지명
