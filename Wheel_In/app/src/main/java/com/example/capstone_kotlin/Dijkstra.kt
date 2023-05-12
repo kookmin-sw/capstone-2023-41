@@ -61,7 +61,7 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return ""
     }
 
-    fun findShortestPath(graph: List<Triple<Int, Int, Int>>): List<Pair<Int, String>> {
+    fun findShortestPath(graph: List<Triple<Int, Int, Int>>): List<Triple<Int, String, String>> {
         val distances = ArrayList<Pair<Int, Int>>()
         val visited = ArrayList<Pair<Int, Boolean>>()
         val previous = ArrayList<Pair<Int, Int>>()
@@ -115,7 +115,7 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return buildPath(previous)
     }
 
-    fun buildPath(previous: ArrayList<Pair<Int, Int>>): List<Pair<Int, String>> {
+    fun buildPath(previous: ArrayList<Pair<Int, Int>>): List<Triple<Int, String, String>> {
         val path = mutableListOf<Int>()
         var currentIndex = endID
 
@@ -129,16 +129,16 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return bulidDirect(path)
     }
 
-    fun bulidDirect(path: List<Int>): List<Pair<Int, String>> {
-        val result = ArrayList<Pair<Int, String>>()
+    fun bulidDirect(path: List<Int>): List<Triple<Int, String, String>> {
+        val result = ArrayList<Triple<Int, String, String>>()
 
-        result.add(Pair(path[0], "start"))
+        result.add(Triple(path[0], "start", "start"))
 
         for (i in 1..path.size - 2) {
-            result.add(Pair(path[i], findDirect(path[i - 1], path[i])))
+            result.add(Triple(path[i], findDirect(path[i - 1], path[i]), findDirect(path[i], path[i + 1])))
         }
 
-        result.add(Pair(path[path.size - 1], "end"))
+        result.add(Triple(path[path.size - 1], "end", "end"))
 
         return result
     }
