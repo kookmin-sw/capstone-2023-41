@@ -159,6 +159,52 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             }
         })
 
+        // 화장실 검색 버튼
+        var toiletButton: Button = findViewById(R.id.btn_toilet)
+
+        // 출입문 검색 버튼
+        var enterButton: Button = findViewById(R.id.btn_enter)
+
+        // 엘레베이터
+        var elevatorButton: Button = findViewById(R.id.btn_elevator)
+
+        // 층수 값 n = 400~499
+        // 화장실 찾기 버튼 활성화. //1
+        toiletButton.setOnClickListener(){
+            map.clearPin()
+            for (i in nodesPlace)
+            {
+                if(i.checkplace == 1)
+                {
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                }
+            }
+        }
+
+        // 출입문 찾기 버튼 활성화. //3
+        enterButton.setOnClickListener(){
+            map.clearPin()
+            for (i in nodesPlace)
+            {
+                if(i.checkplace == 3)
+                {
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                }
+            }
+        }
+
+        // 엘레베이터 찾기 버튼 활성화. //2
+        elevatorButton.setOnClickListener(){
+            map.clearPin()
+            for (i in nodesPlace)
+            {
+                if(i.checkplace == 2)
+                {
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                }
+            }
+        }
+
         // 정보창 활성화 시 배경 가리기.
         info.setBackgroundResource(R.drawable.white_space)
 
@@ -301,17 +347,32 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 var pointt = db!!.findCrosstoID(i.first, nodesCross!!)
                 map?.addLine(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), Color.GREEN)
 
-                if (i.third == "east") {
-                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.east_arrow)
-                }
-                else if (i.third == "west") {
-                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.west_arrow)
-                }
-                else if (i.third == "south") {
-                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.south_arrow)
-                }
-                else if (i.third == "north") {
-                    map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.north_arrow)
+                if ((i.first % 100) > 70) {
+                    if (i.third == "east") {
+                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.east_arrow)
+                    }
+                    else if (i.third == "west") {
+                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.west_arrow)
+                    }
+                    else if (i.third == "south") {
+                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.south_arrow)
+                    }
+                    else if (i.third == "north") {
+                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.north_arrow)
+                    }
+
+//                    if (i.second == "east") {
+//                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.east_arrow)
+//                    }
+//                    else if (i.second == "west") {
+//                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.west_arrow)
+//                    }
+//                    else if (i.second == "south") {
+//                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.south_arrow)
+//                    }
+//                    else if (i.second == "north") {
+//                        map?.addPin(PointF(pointt!!.x.toFloat()*ratio!!, pointt!!.y.toFloat()*ratio!!), 1, R.drawable.north_arrow)
+//                    }
                 }
             }
 
