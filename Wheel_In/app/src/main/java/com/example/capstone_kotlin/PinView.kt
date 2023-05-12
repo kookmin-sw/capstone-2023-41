@@ -8,7 +8,16 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? = null) :
     SubsamplingScaleImageView(context, attr) {
 
-    data class Pin(var id: String, var point: PointF, var fixed: Int, var imageId: Int, var width: Float, var height: Float, var text: String)
+    data class Pin(
+        var id: String,
+        var point: PointF,
+        var fixed: Int,
+        var imageId: Int,
+        var width: Float,
+        var height: Float,
+        var text: String
+    )
+
     data class Line(var id: String, var point: PointF, var color: Int)
 
     private val paint = Paint()
@@ -20,17 +29,25 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     var w: Float? = null
     var h: Float? = null
 
-
-    /**
-     * 지도(기본 이미지)위에 기본 Pin을 추가하고 나머지는 초기화합니다.
-     * @param nPin Pin 이 표시될 좌표값입니다.
-     */
-    fun setPin(sPin: PointF?) {
-        pinArray = arrayListOf()
-        //pinArray.add(Pin("0", sPin!!, 0, R.drawable.pushpin_blue, ""))
+    fun addStartPin(nPin: PointF?, fix: Int, imageID: Int?) {
+        addPin(nPin!!, fix, imageID!!, id = "start")
         invalidate()
-        this.sPin = sPin
-        //initialise()
+    }
+
+    fun addEndPin(nPin: PointF?, fix: Int, imageID: Int?) {
+        addPin(nPin!!, fix, imageID!!, id = "end")
+        invalidate()
+    }
+
+    fun clearStartPin() {
+        removePin("start")
+        lineArray = arrayListOf()
+        invalidate()
+    }
+
+    fun clearEndPin() {
+        removePin("end")
+        lineArray = arrayListOf()
         invalidate()
     }
 
@@ -40,20 +57,43 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
      * @param fix Pin 이미지가 지도와 함께 축소, 확대될지 결정합니다. 0:적용 1:적용안함
      * @param imageID Pin 이미지의 ID 값입니다. (ex: R.drawable.image_name)
      */
-    fun addPin(point: PointF, fix: Int = 0, imageID: Int = R.drawable.pushpin_blue, id: String = "0", width:Float = 2.0f, height: Float = 1.0f, text: String = "")
-    {
+    fun addPin(
+        point: PointF,
+        fix: Int = 0,
+        imageID: Int = R.drawable.pushpin_blue,
+        id: String = "0",
+        width: Float = 2.0f,
+        height: Float = 1.0f,
+        text: String = ""
+    ) {
         pinArray.add(Pin(id, point, fix, imageID, width, height, text))
         invalidate()
     }
+
     // 설정된 자료형 기준 순서 위는 기존 설계 + 제작하면서 추가된 순서 - 기존 코드 변경을 막기 위함.
-    fun addPin(id: String = "0", nPin: PointF, fix: Int = 0, imageID: Int = R.drawable.pushpin_blue, width:Float = 2.0f, height: Float = 1.0f, text: String = "")
-    {
+    fun addPin(
+        id: String = "0",
+        nPin: PointF,
+        fix: Int = 0,
+        imageID: Int = R.drawable.pushpin_blue,
+        width: Float = 2.0f,
+        height: Float = 1.0f,
+        text: String = ""
+    ) {
         pinArray.add(Pin(id, nPin, fix, imageID, width, height, text))
         invalidate()
     }
+
     // 설정된 자료형 기준 순서 + width , height 의 자료형이 Int
-    fun addPin(id: String = "0", nPin: PointF, fix: Int = 0, imageID: Int = R.drawable.pushpin_blue, width:Int = 2, height: Int = 1, text: String = "")
-    {
+    fun addPin(
+        id: String = "0",
+        nPin: PointF,
+        fix: Int = 0,
+        imageID: Int = R.drawable.pushpin_blue,
+        width: Int = 2,
+        height: Int = 1,
+        text: String = ""
+    ) {
         pinArray.add(Pin(id, nPin, fix, imageID, width.toFloat(), height.toFloat(), text))
         invalidate()
     }
@@ -63,20 +103,44 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
      * @param point PointF 형식의 좌표입니다.
      * @param color 표현될 선의 색깔입니다. 1번 좌표, 2번 좌표 를 추가했을때 1번 좌표와 함께 입력된 색깔이 선의 색깔이 됩니다.
      */
-    fun addLine(point: PointF, color: Int, id: String = "0")
-    {
+    fun addLine(point: PointF, color: Int, id: String = "0") {
         lineArray.add(Line(id, point, color))
         invalidate()
     }
 
     /**
-     * 지도(기본 이미지)위에 표시된 Pin을 모두 제거합니다.
+     * 지도(기본 이미지)위에 표시된 id == 0인 Pin을 모두 제거합니다.
+     * id = 0 은 이 PinView에서 사용되는 기본값 입니다.
      */
     fun clearPin()
     {
-        //pinArray = arrayListOf()
+        removePin("0")
         lineArray = arrayListOf()
         invalidate()
+    }
+
+    /**
+     * @param id 조건으로 사용되는 id 입니다.
+     * 지도 위에 표시된 id == clearPin.id 인 Pin을 제외하고 모두 제거합니다.
+     * 해당 id의 핀을 모두 제거하려면 removePin을 사용하세요.
+     */
+    fun clearPin(id:String)
+    {
+        var removed = pinArray.filterIndexed { index, value -> value.id == id }
+        pinArray = removed as ArrayList<Pin>
+        lineArray = arrayListOf()
+        invalidate()
+    }
+
+
+    /**
+     * @param id 조건으로 사용되는 id 입니다.
+     * 지도 위에 표시된 id == clearPin.id 인 Pin을 모두 제거합니다.
+     */
+    fun removePin(id:String)
+    {
+        var removed = pinArray.filterIndexed { index, value -> value.id != id }
+        pinArray = removed as ArrayList<Pin>
     }
 
     private fun initialise() {invalidate()}
