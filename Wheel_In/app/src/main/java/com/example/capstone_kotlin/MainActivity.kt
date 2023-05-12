@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent // Intent는 액티비티간 데이터를 전달하는데 사용된다.
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.drawable.BitmapDrawable
@@ -31,6 +30,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var searchView1: SearchView
     private lateinit var searchView2: SearchView
 
+    //    테스트용
+    private lateinit var searchView_layout: LinearLayout
+    private lateinit var cancel: Button
+
     // 정보창 및 표시될 사진, 지명, 접근성
     private lateinit var info: FrameLayout
     private lateinit var infoPic1: ImageView
@@ -39,7 +42,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var infoText2: TextView
 
     // QR 촬영으로 값 받아올 변수
-    private var returnedData: String? = null
     private var id: DataBaseHelper.PlaceNode? = null
 
     // MapActivity 선언부
@@ -50,6 +52,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // DB
     private lateinit var db: DataBaseHelper
+
+    private lateinit var floorsIndoor: List<DataBaseHelper.IndoorFloor>
     private lateinit var nodesPlace: List<DataBaseHelper.PlaceNode>
     private lateinit var nodesCross: List<DataBaseHelper.CrossNode>
 
@@ -61,72 +65,53 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // mapvar
     var startId: String? = null;
-    var endId: String? = null
+    var endId: String? = null;
 
+    // 터치 on/off
     var interaction: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) { // onCreate 함수를 오버라이드. 이 함수는 액티비티가 생성될 때 호출됨.
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
         setContentView(R.layout.activity_main)
 
+        //        테스트용
+        cancel = findViewById(R.id.cancel)
+        cancel.setOnClickListener{
+            searchView2.setQuery("", true)
+            searchView1.setQuery("", true)
+
+            map.clearPin()
+            map.clearStartPin()
+            map.clearEndPin()
+
+            startId = null
+            endId = null
+
+            interaction = true
+        }
+
         map = findViewById(R.id.map);
+        map.setImage(ImageSource.resource(R.drawable.mirae_4f))
+        // 지도 크기 제한
+        map.maxScale = 1f
+
+
 
         // 출발지, 목적지 입력 서치뷰
         searchView1 = findViewById(R.id.searchView1)
         searchView2 = findViewById(R.id.searchView2)
 
-        // QR 촬영 버튼
-        var qrButton: Button = findViewById(R.id.qrButton)
-
-        // 층 수 스피너
-        val spinner: Spinner = findViewById(R.id.spinner)
-
-        // 정보창
-        info = findViewById(R.id.info)
-
-        // 정보창에 띄울 정보들
-        infoText1 = findViewById(R.id.text1)
-        infoText2 = findViewById(R.id.text2)
-
-        infoPic1 = findViewById(R.id.infoPic1)
-        infoPic2 = findViewById(R.id.infoPic2)
-
-        // 출발, 도착 버튼
-        var start = findViewById<Button>(R.id.start)
-        var end = findViewById<Button>(R.id.end)
-
-        // 지도 크기 제한
-        map.maxScale = 1f
-
-        db = DataBaseHelper(this)
-        nodesPlace = db.getNodesPlace()
-        nodesCross = db.getNodesCross()
-
-        // QR 촬영 버튼 활성화.
-        qrButton.setOnClickListener{
-            val intent = Intent(this, ScanActivity::class.java)
-            startActivityForResult(intent, REQUEST_CODE)
-        }
-
-        // 비상 연락망 변수 추가
-        val btn_emergency: Button = findViewById(R.id.btn_emergency)
-        btn_emergency.setOnClickListener {
-            showEmergencyPopup()
-        }
-
-        // 스피너에 항목 추가.
-        val items: MutableList<String> = ArrayList()
-        items.add("미래관 4층")
-        items.add("미래관 3층")
-        items.add("미래관 2층")
+        //테스트용
+        searchView_layout = findViewById(R.id.searchView_layout)
+        var layoutParams = searchView_layout.layoutParams as LinearLayout.LayoutParams
 
         // 출발지와 목적지 입력 서치뷰 활성화.
-        // 2023-05-27 15시 기준 : 현재 serachView 를 입력 시 serachView2가 보임.
-        // 두 searchView 모두 비어있어야 searchView2 사라짐.
         searchView1.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isEmpty() && searchView2.query.isEmpty()) {
                     searchView2.visibility = View.GONE
+                    layoutParams.weight = 1f
+                    searchView_layout.layoutParams = layoutParams
                 }
                 return true
             }
@@ -134,7 +119,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (query.isEmpty() && searchView2.query.isEmpty()) {
                     searchView2.visibility = View.GONE
+                    layoutParams.weight = 1f
+                    searchView_layout.layoutParams = layoutParams
                 } else {
+                    layoutParams.weight = 2f
+                    searchView_layout.layoutParams = layoutParams
                     searchView2.visibility = View.VISIBLE
                 }
                 return true
@@ -146,8 +135,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 // searchView2의 입력 상태에 따라 처리
                 if (newText.isEmpty() && searchView1.query.isEmpty()) {
                     searchView2.visibility = View.GONE
+                    layoutParams.weight = 1f
+                    searchView_layout.layoutParams = layoutParams
                 } else {
                     searchView2.visibility = View.VISIBLE
+                    layoutParams.weight = 2f
+                    searchView_layout.layoutParams = layoutParams
                 }
                 return true
             }
@@ -156,6 +149,55 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 return true
             }
         })
+
+
+
+        // QR 촬영 버튼
+        var qrButton: Button = findViewById(R.id.qrButton)
+        // QR 촬영 버튼 활성화.
+        qrButton.setOnClickListener{
+            val intent = Intent(this, ScanActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE)
+        }
+
+
+
+        // 층 수 스피너
+        val spinner: Spinner = findViewById(R.id.spinner)
+        // 스피너에 항목 추가.
+        val items: MutableList<String> = ArrayList()
+        items.add("미래관 4층")
+        items.add("미래관 3층")
+        items.add("미래관 2층")
+        // 스피너 활성화
+        val adapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem: String = parent.getItemAtPosition(position) as String
+                if (selectedItem == "Add New Item") {
+                    // Do something
+                } else {
+                    Toast.makeText(applicationContext, "Selected item: $selectedItem", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+
+
+        // 정보창
+        info = findViewById(R.id.info)
+
+        // 정보창에 띄울 정보들
+        infoText1 = findViewById(R.id.text1)
+        infoText2 = findViewById(R.id.text2)
+
+        infoPic1 = findViewById(R.id.infoPic1)
+        infoPic2 = findViewById(R.id.infoPic2)
 
         // 정보창 활성화 시 배경 가리기.
         info.setBackgroundResource(R.drawable.white_space)
@@ -167,6 +209,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             true
         }
 
+
+
+        // 출발, 도착 버튼
+        var start = findViewById<Button>(R.id.start)
+        var end = findViewById<Button>(R.id.end)
+
         // 출발 버튼 누르면 searchView1 채우기
         start.setOnClickListener{
             searchView1.setQuery(id?.name, true)
@@ -174,7 +222,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map.clearStartPin()
             map.clearPin()
             map.addStartPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.pushpin_blue)
-            Toast.makeText(applicationContext, startId, Toast.LENGTH_SHORT).show()
             mapInit()
             info.visibility = View.GONE
         }
@@ -186,13 +233,73 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map.clearEndPin()
             map.addEndPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
             endId = id?.id.toString()
-            Toast.makeText(applicationContext, endId, Toast.LENGTH_SHORT).show()
             mapInit()
             info.visibility = View.GONE
         }
-        // 화면 비율
-        ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
 
+
+
+        // DB
+        db = DataBaseHelper(this)
+        nodesPlace = db.getNodesPlace()
+        nodesCross = db.getNodesCross()
+        floorsIndoor = db.getFloorsIndoor()
+
+
+
+        // 비상 연락망 변수 추가
+        val btn_emergency: Button = findViewById(R.id.btn_emergency)
+        btn_emergency.setOnClickListener {
+            showEmergencyPopup()
+        }
+
+
+
+        // 화장실 검색 버튼
+        var toiletButton: Button = findViewById(R.id.btn_toilet)
+        // 출입문 검색 버튼
+        var enterButton: Button = findViewById(R.id.btn_enter)
+        // 엘레베이터
+        var elevatorButton: Button = findViewById(R.id.btn_elevator)
+
+        // 층수 값 n = 400~499
+        // 화장실 찾기 버튼 활성화. //1
+        toiletButton.setOnClickListener(){
+            map.clearPin()
+            for (i in nodesPlace)
+            {
+                if(i.checkplace == 1)
+                {
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                }
+            }
+        }
+        // 엘레베이터 찾기 버튼 활성화. //2
+        elevatorButton.setOnClickListener(){
+            map.clearPin()
+            for (i in nodesPlace)
+            {
+                if(i.checkplace == 2)
+                {
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                }
+            }
+        }
+        // 출입문 찾기 버튼 활성화. //3
+        enterButton.setOnClickListener(){
+            map.clearPin()
+            for (i in nodesPlace)
+            {
+                if(i.checkplace == 3)
+                {
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                }
+            }
+        }
+
+
+
+        // 터치 이벤트
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 if(interaction){
@@ -220,49 +327,26 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             )
         })
 
-        // 스피너 활성화
-        val adapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedItem: String = parent.getItemAtPosition(position) as String
-                if (selectedItem == "Add New Item") {
-                    // Do something
-                } else {
-                    Toast.makeText(applicationContext, "Selected item: $selectedItem", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-
-
 
         // MapActivity 연결부
-        map.setImage(ImageSource.resource(R.drawable.mirae_4f))
+        val drawableName = db.findMaptoFloor(4, floorsIndoor)
+        val drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
+        map.setImage(ImageSource.resource(drawableId))
 
-        // 그려졌을때 실행되는 함수
-//        map.viewTreeObserver!!.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
-//            override fun onGlobalLayout() {
-//                mapInit();
-//                map.viewTreeObserver!!.removeOnGlobalLayoutListener(this)
-//            }
-//        })
+
+
+        // 화면 비율
+        ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
+
+
+
     }
 
     fun mapInit()
     {
+
         var scid = db.findCrosstoID(startId?.toInt(), nodesCross)
         var ecid = db.findCrosstoID(endId?.toInt(), nodesCross)
-
-        var navi = findViewById<FrameLayout>(R.id.navi)
-
-        var navi_start = findViewById<Button>(R.id.navi_start)
-        var navi_end = findViewById<Button>(R.id.navi_end)
-
-        var navi_layout = findViewById<LinearLayout>(R.id.navi_layout)
 
         if (startId != null && endId != null)
         {
@@ -273,51 +357,28 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
 
             dijk = Dijkstra(nodesCross, startId!!.toInt(), endId!!.toInt())
-            var root = dijk.findShortestPath(dijk.makeGraph())
+            var root = dijk.findShortestPath(dijk!!.makeGraph())
             for (i in root)
             {
-                var pointt = db.findCrosstoID(i.first, nodesCross)
-                map.addLine(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), Color.GREEN)
+                var pointt = db.findCrosstoID(i.first, nodesCross!!)
+                var tempX = pointt!!.x.toFloat()*ratio
+                var tempY = pointt!!.y.toFloat()*ratio
+                map.addLine(PointF(tempX, tempY), Color.GREEN)
 
-                if (i.second != "start" && i.second != "end" && i.second != "place") {
-                    map.addPin(PointF(pointt!!.x.toFloat()*ratio, pointt!!.y.toFloat()*ratio), 1, R.drawable.crossroad)
+                if ((i.first % 100) > 70) {
+                    if (i.third == "east") {
+                        map.addPin(PointF(tempX, tempY), 1, R.drawable.east_arrow)
+                    }
+                    else if (i.third == "west") {
+                        map.addPin(PointF(tempX, tempY), 1, R.drawable.west_arrow)
+                    }
+                    else if (i.third == "south") {
+                        map.addPin(PointF(tempX, tempY), 1, R.drawable.south_arrow)
+                    }
+                    else if (i.third == "north") {
+                        map.addPin(PointF(tempX, tempY), 1, R.drawable.north_arrow)
+                    }
                 }
-
-            }
-
-            navi.visibility = View.VISIBLE
-            navi_layout.visibility = View.GONE
-            navi_start.setOnClickListener {
-                navi.setBackgroundResource(R.drawable.white_space)
-
-                navi.setOnTouchListener { _, event ->
-                    // frameLayout을 터치할 때 이벤트가 발생하면 true를 반환하여
-                    // 해당 이벤트를 소비하고, map의 onTouchEvent를 호출하지 않도록 합니다.
-                    true
-                }
-
-                navi_start.visibility = View.GONE
-                navi_layout.visibility = View.VISIBLE
-            }
-
-            navi_end.setOnClickListener{
-
-                searchView2.setQuery("", true)
-                searchView1.setQuery("", true)
-
-                map.clearPin()
-                map.clearStartPin()
-                map.clearEndPin()
-
-                startId = null
-                endId = null
-
-                interaction = true
-                navi.setBackgroundResource(0)
-
-                navi_start.visibility = View.VISIBLE
-
-                navi.visibility = View.GONE
             }
         }
     }
@@ -327,15 +388,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     // QR 촬영 후 데이터 값 받아옴.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            returnedData = data?.getStringExtra("QRdata")
+            val returnedData = data?.getStringExtra("QRdata")
             Toast.makeText(this, returnedData, Toast.LENGTH_SHORT).show()
             id = db.findPlacetoID(returnedData!!.toInt(), nodesPlace)
             showInfo(id)
         }
     }
-
 
 
     // 비상 연락처 호출 함수
@@ -369,12 +428,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         alertDialog.show()
     }
 
-    // QR 촬영 및 터치로 값 받아오기
-    fun showInfo(id: DataBaseHelper.PlaceNode?){
+    fun showInfo(id: DataBaseHelper.PlaceNode?) {
         if (id != null) {
             // 정보 사진
             infoPic1.setImageBitmap(id?.img1)
             infoPic2.setImageBitmap(id?.img2)
+
             // 접근성
             if(id?.access == 0){
                 infoText2.setBackgroundColor(Color.RED)
@@ -385,8 +444,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             if(id?.access == 2){
                 infoText2.setBackgroundColor(Color.GREEN)
             }
+
             // 지명
-            infoText1.setText(id?.name + id?.id)
+            infoText1.setText(id?.name)
             info.visibility = View.VISIBLE
 
             map.animateScaleAndCenter(1f,PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio))?.start()

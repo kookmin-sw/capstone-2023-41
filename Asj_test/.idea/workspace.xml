@@ -11,7 +11,6 @@
   <component name="ChangeListManager">
     <list default="true" id="649846e4-3b08-4913-9136-d3f0b5e071a4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/capstone_kotlin/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/capstone_kotlin/MainActivity.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../dijkstra.kt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -19,7 +18,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[R39M503VR5H]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\asj\.android\avd\Pixel_2_API_31.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
