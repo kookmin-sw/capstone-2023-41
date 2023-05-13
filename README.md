@@ -1,6 +1,6 @@
 # 캡스톤디자인 41팀 소개 페이지
 
-<!-- 이미지 -->
+<img src="./docs/img/Logo.PNG" alt="로고" width="400" />
 
 ## 1. 프로젝트 소개
 ### 휠체어 사용자를 위한 실내 내비게이션
@@ -15,11 +15,20 @@
 
 ## 2. 주요 기능
 
+추가 예정
 
 ## 3. 시연 동영상
 
+추가 예정
 
 ## 4. 소개 자료
 
+[중간발표자료](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C.pdf)
+
+[중간보고서](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B3%B4%EA%B3%A0%EC%84%9C.pdf)
 
 ## 5. 팀 소개
+
+추가 예정
+
+<!-- github slack test! -->
