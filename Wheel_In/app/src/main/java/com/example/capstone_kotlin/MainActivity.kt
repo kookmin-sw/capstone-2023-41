@@ -26,13 +26,13 @@ import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
 
 class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActivity 클래스를 상속받음
 
-    // 테스트위해서 lateinit 설정
     private lateinit var searchView1: SearchView
-    private lateinit var searchView2: SearchView
 
-    //    테스트용
+    // 두번째 서치뷰 관련
+    private lateinit var searchView2: SearchView
     private lateinit var searchView_layout: LinearLayout
     private lateinit var cancel: Button
+    private lateinit var svAndCancel: LinearLayout
 
     // 정보창 및 표시될 사진, 지명, 접근성
     private lateinit var info: FrameLayout
@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
         setContentView(R.layout.activity_main)
 
+        svAndCancel = findViewById(R.id.svAndCancel)
         //        테스트용
         cancel = findViewById(R.id.cancel)
         cancel.setOnClickListener{
@@ -101,16 +102,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         searchView1 = findViewById(R.id.searchView1)
         searchView2 = findViewById(R.id.searchView2)
 
-        //테스트용
+        // 두번째 searchView와 취소버튼이 나타남에 따라 레이아웃 비율 조절.
         searchView_layout = findViewById(R.id.searchView_layout)
         var layoutParams = searchView_layout.layoutParams as LinearLayout.LayoutParams
 
         // 출발지와 목적지 입력 서치뷰 활성화.
+        // 두번째 searchView 와 취소 버튼을 같이 나타나고 사라지게 조절.
         searchView1.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isEmpty() && searchView2.query.isEmpty()) {
-                    searchView2.visibility = View.GONE
-                    layoutParams.weight = 1f
+                    svAndCancel.visibility = View.GONE
+                    layoutParams.weight = 1.3f
                     searchView_layout.layoutParams = layoutParams
                 }
                 return true
@@ -118,13 +120,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (query.isEmpty() && searchView2.query.isEmpty()) {
-                    searchView2.visibility = View.GONE
-                    layoutParams.weight = 1f
+                    svAndCancel.visibility = View.GONE
+                    layoutParams.weight = 1.3f
                     searchView_layout.layoutParams = layoutParams
                 } else {
-                    layoutParams.weight = 2f
+                    layoutParams.weight = 3f
                     searchView_layout.layoutParams = layoutParams
-                    searchView2.visibility = View.VISIBLE
+                    svAndCancel.visibility = View.VISIBLE
                 }
                 return true
             }
@@ -134,12 +136,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             override fun onQueryTextChange(newText: String): Boolean {
                 // searchView2의 입력 상태에 따라 처리
                 if (newText.isEmpty() && searchView1.query.isEmpty()) {
-                    searchView2.visibility = View.GONE
-                    layoutParams.weight = 1f
+                    svAndCancel.visibility = View.GONE
+                    layoutParams.weight = 1.3f
                     searchView_layout.layoutParams = layoutParams
                 } else {
-                    searchView2.visibility = View.VISIBLE
-                    layoutParams.weight = 2f
+                    svAndCancel.visibility = View.VISIBLE
+                    layoutParams.weight = 3f
                     searchView_layout.layoutParams = layoutParams
                 }
                 return true
