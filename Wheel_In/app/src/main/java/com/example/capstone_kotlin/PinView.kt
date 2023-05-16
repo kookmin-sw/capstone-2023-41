@@ -196,12 +196,12 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
             if(fix == 1) // 확대 축소에 따라 크기가 변하지 않음
             {
                 image = Bitmap.createScaledBitmap(image!!, (w!!).toInt(), (h!!).toInt(), true)
-                myPaint.textSize = 100.0f
+                myPaint.textSize = 50.0f
             }
             else // 확대 축소에 따라 크기가 변함
             {
                 image= Bitmap.createScaledBitmap(image!!, (w!!*s).toInt(), (h!!*s).toInt(), true)
-                myPaint.textSize = 100.0f * s
+                myPaint.textSize = 50.0f * s
             }
             val vX = vPin.x - image!!.width / i.width //(/2가 없는 경우 해당 좌표기준 좌측 위로 이미지가 생성됨)
             val vY = vPin.y - image!!.height / i.height

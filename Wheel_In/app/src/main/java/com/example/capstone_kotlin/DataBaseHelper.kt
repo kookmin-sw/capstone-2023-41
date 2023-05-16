@@ -58,7 +58,7 @@ class DataBaseHelper(private val context: Context) :
 
     data class IndoorFloor(val idx: Int, val placeid: Int, val floorid: Int, val name: String, val mapname: String)
 
-    data class PlaceNode(val placeid: Int, val id: Int, val name: String, val checkplace: Int,
+    data class PlaceNode(val placeid: Int, val id: Int, val name: String, val nickname: String, val checkplace: Int,
                          val x: Int, val y: Int, val access: Int, val img1: Bitmap?, val img2: Bitmap?)
     data class CrossNode(val placeid: Int, val id: Int, val x: Int, val y: Int, val nodes: List<Triple<Int, Int, String>>,
                          val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
@@ -97,18 +97,19 @@ class DataBaseHelper(private val context: Context) :
                 val placeid = it.getInt(0)
                 val id = it.getInt(1)
                 val name = it.getString(2)
-                val checkplace = it.getInt(3)
-                val x = it.getInt(4)
-                val y = it.getInt(5)
-                val access = it.getInt(6)
+                val nickname = it.getString(3)
+                val checkplace = it.getInt(4)
+                val x = it.getInt(5)
+                val y = it.getInt(6)
+                val access = it.getInt(7)
 
-                val bytes1: ByteArray = it.getBlob(7)
-                val bytes2: ByteArray = it.getBlob(8)
+                val bytes1: ByteArray = it.getBlob(8)
+                val bytes2: ByteArray = it.getBlob(9)
 
                 val img1: Bitmap? = BitmapFactory.decodeByteArray(bytes1, 0, bytes1.size)
                 val img2: Bitmap? = BitmapFactory.decodeByteArray(bytes2, 0, bytes2.size)
 
-                placeList.add(PlaceNode(placeid, id, name, checkplace, x, y, access, img1, img2))
+                placeList.add(PlaceNode(placeid, id, name, nickname, checkplace, x, y, access, img1, img2))
             }
 
             it.close()
