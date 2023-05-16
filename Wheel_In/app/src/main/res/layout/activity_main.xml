@@ -7,6 +7,11 @@
     android:scrollbarSize="10dp"
     tools:context=".MainActivity">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
     <!--    화면 전체 레이아웃-->
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,15 +32,34 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <SearchView
-                    android:id="@+id/searchView1"
-                    android:layout_width="280dp"
-                    android:layout_height="70dp"
-                    android:queryHint="목적지를 입력하세요."
-                    android:iconifiedByDefault="false"
-                    android:background="@drawable/searchview_radious"
-                    android:layout_margin="5dp"
-                    />
+<!--                <LinearLayout-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="vertical">-->
+
+                    <SearchView
+                        android:id="@+id/searchView1"
+                        android:layout_width="280dp"
+                        android:layout_height="70dp"
+                        android:queryHint="목적지를 입력하세요."
+                        android:iconifiedByDefault="false"
+                        android:background="@drawable/searchview_radious"
+                        android:layout_margin="5dp"
+                        />
+<!--                    <ListView-->
+<!--                        android:layout_marginLeft="5dp"-->
+<!--                        android:id="@+id/listView1"-->
+<!--                        android:layout_width="280dp"-->
+<!--                        android:layout_height="100dp"-->
+<!--                        android:divider="#ad5"-->
+<!--                        android:dividerHeight="2dp"-->
+<!--                        />-->
+
+<!--                </LinearLayout>-->
+
+
+
+
 
                 <Button
                     android:id="@+id/qrButton"
@@ -157,6 +181,7 @@
     </LinearLayout>
     <!--    화면 전체 레이아웃 끝-->
 
+    </RelativeLayout>
 
     <!--    정보창 전체 레이아웃-->
     <FrameLayout

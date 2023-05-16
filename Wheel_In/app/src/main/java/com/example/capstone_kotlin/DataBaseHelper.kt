@@ -178,13 +178,25 @@ class DataBaseHelper(private val context: Context) :
         return null
     }
 
-    fun findPlacetoID(id: Int?, list: List<PlaceNode>): PlaceNode? {
+    fun findPlacetoID(id: String, list: List<PlaceNode>): PlaceNode? {
         for (i in list) {
-            if (i.id == id) {
+            if(i.name == id || i.id.toString() == id){
+                return i
+            }
+//            else if(i.id == id.toInt()){
+//                return i
+//            }
+        }
+
+        return null
+    }
+
+    fun findPlaceToName(name: String, list: List<PlaceNode>): PlaceNode? {
+        for (i in list){
+            if(i.name == name){
                 return i
             }
         }
-
         return null
     }
 
@@ -197,6 +209,7 @@ class DataBaseHelper(private val context: Context) :
 
         return null
     }
+
 
     fun findMaptoFloor(floorid: Int, list: List<IndoorFloor>): String? {
         for (i in list) {
