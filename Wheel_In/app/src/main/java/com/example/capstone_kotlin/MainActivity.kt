@@ -485,22 +485,44 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     fun choiceArrow(second: String, third: String): Int {
         if (second == "east") {
-            if (third == "north") {
-                return R.drawable.west_arrow
-            }
-            else if (third == "south") {
+            if (third == "south") {
                 return R.drawable.east_arrow
+            }
+            else if (third == "north") {
+                return R.drawable.west_arrow
             }
             else {
                 return R.drawable.north_arrow
             }
         }
         else if (second == "west") {
-            if (third == "south") {
+            if (third == "north") {
+                return R.drawable.east_arrow
+            }
+            else if (third == "south") {
                 return R.drawable.west_arrow
             }
-            else if (third == "north") {
+            else {
+                return R.drawable.north_arrow
+            }
+        }
+        else if (second == "south") {
+            if (third == "west") {
                 return R.drawable.east_arrow
+            }
+            else if (third == "east") {
+                return R.drawable.west_arrow
+            }
+            else {
+                return R.drawable.north_arrow
+            }
+        }
+        else if (second == "north") {
+            if (third == "east") {
+                return R.drawable.east_arrow
+            }
+            else if (third == "west") {
+                return R.drawable.west_arrow
             }
             else {
                 return R.drawable.north_arrow
@@ -511,5 +533,3 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
     }
 }
-
-
