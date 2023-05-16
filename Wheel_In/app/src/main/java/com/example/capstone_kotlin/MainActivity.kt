@@ -41,6 +41,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var infoText1: TextView
     private lateinit var infoText2: TextView
 
+    private lateinit var spinner: Spinner
+
     // QR 촬영으로 값 받아올 변수
     private var id: DataBaseHelper.PlaceNode? = null
 
@@ -63,6 +65,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     // 길찾기
     private lateinit var dijk: Dijkstra
 
+    // 건물 정보 기본 set
+    private var placeid: Int = 1
     private var floorid: Int = 4
 
     // 지도 좌표 비율
@@ -178,13 +182,16 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
 
         // 층 수 스피너
-        val spinner: Spinner = findViewById(R.id.spinner)
+        spinner = findViewById(R.id.spinner)
 
         // 스피너에 항목 추가.
         val items: MutableList<String> = ArrayList()
-        items.add("미래관 5층")
-        items.add("미래관 4층")
-        items.add("미래관 3층")
+
+        for (i in floorsIndoor) {
+            if (i.placeid == placeid) {
+                items.add(i.name)
+            }
+        }
 
         // 스피너 활성화
         val adapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
@@ -201,7 +208,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 if (selectedItem == "Add New Item") {
                     // Do something
                 }
-                else if (selectedItem == "미래관 5층") {
+                else if (selectedItem == "5층") {
                     drawableName = db.findMaptoFloor(5, floorsIndoor)
                     drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                     floorid = 5
@@ -212,7 +219,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     map.clearPin("icon")
                     addIcon(nodesPlace, floorid)
                 }
-                else if (selectedItem == "미래관 4층") {
+                else if (selectedItem == "4층") {
                     drawableName = db.findMaptoFloor(4, floorsIndoor)
                     drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                     floorid = 4
@@ -223,7 +230,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     map.clearPin("icon")
                     addIcon(nodesPlace, floorid)
                 }
-                else if (selectedItem == "미래관 3층") {
+                else if (selectedItem == "3층") {
                     drawableName = db.findMaptoFloor(3, floorsIndoor)
                     drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                     floorid = 3
@@ -435,7 +442,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val returnedData = data?.getStringExtra("QRdata")
             Toast.makeText(this, returnedData, Toast.LENGTH_SHORT).show()
-            id = db.findPlacetoID(returnedData!!.toInt(), nodesPlace)
+            val parts = returnedData!!.split(" ")
+            placeid = parts[0].toInt()
+            floorid = parts[1].toInt() / 100
+
+            spinner.setSelection(db!!.findIdxtoFloor(floorid, floorsIndoor))
+
+            id = db.findPlacetoID(parts[1].toInt(), nodesPlace)
             showInfo(id)
         }
     }
