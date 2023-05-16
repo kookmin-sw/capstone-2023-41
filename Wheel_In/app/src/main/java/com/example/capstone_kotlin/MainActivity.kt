@@ -44,6 +44,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     // QR 촬영으로 값 받아올 변수
     private var id: DataBaseHelper.PlaceNode? = null
 
+    // 교차로 터치 이벤트 변수
+    private var cross: DataBaseHelper.CrossNode? = null
+
     // MapActivity 선언부
     private lateinit var map: PinView
 
@@ -107,8 +110,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 화면 비율
         ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
-
-        addIcon(nodesPlace)
 
         // 출발지, 목적지 입력 서치뷰
         searchView1 = findViewById(R.id.searchView1)
@@ -205,18 +206,33 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                     floorid = 5
                     map.setImage(ImageSource.resource(drawableId))
+                    map.clearPin()
+                    map.clearStartPin()
+                    map.clearEndPin()
+                    map.clearPin("icon")
+                    addIcon(nodesPlace, floorid)
                 }
                 else if (selectedItem == "미래관 4층") {
                     drawableName = db.findMaptoFloor(4, floorsIndoor)
                     drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                     floorid = 4
                     map.setImage(ImageSource.resource(drawableId))
+                    map.clearPin()
+                    map.clearStartPin()
+                    map.clearEndPin()
+                    map.clearPin("icon")
+                    addIcon(nodesPlace, floorid)
                 }
                 else if (selectedItem == "미래관 3층") {
                     drawableName = db.findMaptoFloor(3, floorsIndoor)
                     drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                     floorid = 3
                     map.setImage(ImageSource.resource(drawableId))
+                    map.clearPin()
+                    map.clearStartPin()
+                    map.clearEndPin()
+                    map.clearPin("icon")
+                    addIcon(nodesPlace, floorid)
                 }
                 else {
                     Toast.makeText(applicationContext, "Selected item: $selectedItem", Toast.LENGTH_SHORT).show()
@@ -348,7 +364,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     return true
                 }
                 else{
-                    return false
+                    var pointt = map.viewToSourceCoord(e.x, e.y);
+                    var x = pointt!!.x/ratio
+                    var y = pointt!!.y/ratio
+                    cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross)
+                    if (cross != null) {
+                        showCross(cross)
+                    }
+                    else if (cross == null) {
+                        showCross(null)
+                    }
+                    return true
                 }
             }
         })
@@ -477,9 +503,29 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
     }
 
-    fun addIcon(nodesPlace: List<DataBaseHelper.PlaceNode>) {
+    fun showCross(cross: DataBaseHelper.CrossNode?) {
+        if (cross != null) {
+            // 정보 사진
+            infoPic1.setImageBitmap(cross?.imgEast)
+            infoPic2.setImageBitmap(cross?.imgWest)
+
+            // 지명
+            infoText1.setText(cross?.nodes.toString())
+            info.visibility = View.VISIBLE
+
+            map.animateScaleAndCenter(1f,PointF(cross.x.toFloat()*ratio, cross.y.toFloat()*ratio))?.start()
+            return
+        }
+        else{
+            info.visibility = View.GONE
+        }
+    }
+
+    fun addIcon(nodesPlace: List<DataBaseHelper.PlaceNode>, floorId: Int) {
         for (i in nodesPlace) {
-            map.addPin("icon", PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 0, R.drawable.icon, 2.0f, 2.0f, i.name)
+            if (i.id / 100 == floorId) {
+                map.addPin("icon", PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 0, R.drawable.icon, 2.0f, 2.0f, i.name)
+            }
         }
     }
 

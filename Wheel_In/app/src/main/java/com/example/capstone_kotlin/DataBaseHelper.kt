@@ -188,6 +188,16 @@ class DataBaseHelper(private val context: Context) :
         return null
     }
 
+    fun findCrosstoXY(x: Int, y: Int, list: List<CrossNode>): CrossNode? {
+        for (i in list) {
+            if ((i.x - 25 <= x && x <= i.x + 25) && (i.y - 25 <= y && y <= i.y + 25)) {
+                return i
+            }
+        }
+
+        return null
+    }
+
     fun findCrosstoID(id: Int?, list: List<CrossNode>): CrossNode? {
         for (i in list) {
             if (i.id == id) {
