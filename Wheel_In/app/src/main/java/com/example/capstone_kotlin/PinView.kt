@@ -212,6 +212,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     }
 
     init {initialise()}
+
 }
 
 //package com.example.capstone_kotlin
@@ -446,3 +447,6 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
 //        initialise()
 //    }
 //}
+=======
+}
+
