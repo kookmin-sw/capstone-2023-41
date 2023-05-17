@@ -181,10 +181,12 @@ class DataBaseHelper(private val context: Context) :
         return 1
     }
 
-    fun findPlacetoXY(x: Int, y: Int, list: List<PlaceNode>): PlaceNode? {
+    fun findPlacetoXY(x: Int, y: Int, list: List<PlaceNode>, floorid: Int): PlaceNode? {
         for (i in list) {
-            if ((i.x - 25 <= x && x <= i.x + 25) && (i.y - 25 <= y && y <= i.y + 25)) {
-                return i
+            if (i.id / 100 == floorid) {
+                if ((i.x - 25 <= x && x <= i.x + 25) && (i.y - 25 <= y && y <= i.y + 25)) {
+                    return i
+                }
             }
         }
 
@@ -201,10 +203,12 @@ class DataBaseHelper(private val context: Context) :
         return null
     }
 
-    fun findCrosstoXY(x: Int, y: Int, list: List<CrossNode>): CrossNode? {
+    fun findCrosstoXY(x: Int, y: Int, list: List<CrossNode>, floorid: Int): CrossNode? {
         for (i in list) {
-            if ((i.x - 25 <= x && x <= i.x + 25) && (i.y - 25 <= y && y <= i.y + 25)) {
-                return i
+            if (i.id / 100 == floorid) {
+                if ((i.x - 25 <= x && x <= i.x + 25) && (i.y - 25 <= y && y <= i.y + 25)) {
+                    return i
+                }
             }
         }
 

@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity // AppCompatActivity 클래스를 임포트. AppCompatActivity는 안드로이드 앱에서 사용되는 기본 클래스
 import android.os.Bundle // Bundle은 액티비티가 시스템에서 재생성될 때 데이터를 저장하고 다시 가져오는 데 사용
 import android.os.Handler
@@ -43,6 +44,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var infoText2: TextView
 
     private lateinit var spinner: Spinner
+
+    private lateinit var testinfo: FrameLayout
+    private lateinit var testbtn: Button
 
     // QR 촬영으로 값 받아올 변수
     private var id: DataBaseHelper.PlaceNode? = null
@@ -108,6 +112,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             endId = null
 
             interaction = true
+
+            testinfo.visibility = View.GONE
         }
 
         map = findViewById(R.id.map);
@@ -275,7 +281,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
 
 
-
         // 출발, 도착 버튼
         var start = findViewById<Button>(R.id.start)
         var end = findViewById<Button>(R.id.end)
@@ -362,7 +367,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var pointt = map.viewToSourceCoord(e.x, e.y);
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
-                    id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
+
+                    id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace, floorid)
                     if (id != null)
                     {
                         map.clearPin()
@@ -377,7 +383,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var pointt = map.viewToSourceCoord(e.x, e.y);
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
-                    cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross)
+                    cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
                     if (cross != null) {
                         showCross(cross, root)
                     }
@@ -398,9 +404,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     // 길 찾기
     fun mapInit()
     {
+        testinfo = findViewById(R.id.testinfo)
+        testbtn = findViewById(R.id.testbtn)
 
         var scid = db.findCrosstoID(startId?.toInt(), nodesCross)
         var ecid = db.findCrosstoID(endId?.toInt(), nodesCross)
+
+        var root1 = mutableListOf<Triple<Int, String, String>>()
+        var root2 = mutableListOf<Triple<Int, String, String>>()
+        var firstfloor = 0
+        var lastfloor = 0
+
 
         if (startId != null && endId != null)
         {
@@ -412,26 +426,46 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             dijk = Dijkstra(nodesCross, startId!!.toInt(), endId!!.toInt())
             root = dijk.findShortestPath(dijk!!.makeGraph())
-            for (i in root)
-            {
-                var pointt = db.findCrosstoID(i.first, nodesCross!!)
-                var tempX = pointt!!.x.toFloat()*ratio
-                var tempY = pointt!!.y.toFloat()*ratio
-                map.addLine(PointF(tempX, tempY), Color.GREEN)
 
-                if ((i.first % 100) > 70) {
-                    if (i.third == "east") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.east_arrow)
+            if (root[0].first / 100 != floorid) {
+                firstfloor = root[0].first / 100
+                lastfloor = floorid
+
+                for (i in root) {
+                    if (i.first / 100 == firstfloor) {
+                        root1.add(i)
                     }
-                    else if (i.third == "west") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.west_arrow)
+
+                    else if (i.first / 100 == lastfloor) {
+                        root2.add(i)
                     }
-                    else if (i.third == "south") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.south_arrow)
-                    }
-                    else if (i.third == "north") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.north_arrow)
-                    }
+                }
+            }
+
+            if (root1.isEmpty()) {
+                makeLine()
+            }
+            else {
+                testinfo.visibility = View.VISIBLE
+
+                spinner.setSelection(db.findIdxtoFloor(firstfloor, floorsIndoor))
+
+                root = root1
+
+                val handler = Handler()
+                handler.postDelayed({
+                    makeLine()
+                }, 1000)
+
+                testbtn.setOnClickListener(){
+                    spinner.setSelection(db.findIdxtoFloor(lastfloor, floorsIndoor))
+
+                    root = root2
+
+                    val handler = Handler()
+                    handler.postDelayed({
+                        makeLine()
+                    }, 1000)
                 }
             }
         }
@@ -621,6 +655,31 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
         else {
             return 0
+        }
+    }
+
+    fun makeLine() {
+        for (i in root)
+        {
+            var pointt = db.findCrosstoID(i.first, nodesCross!!)
+            var tempX = pointt!!.x.toFloat()*ratio
+            var tempY = pointt!!.y.toFloat()*ratio
+            map.addLine(PointF(tempX, tempY), Color.GREEN)
+
+            if ((i.first % 100) > 70) {
+                if (i.third == "east") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.east_arrow)
+                }
+                else if (i.third == "west") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.west_arrow)
+                }
+                else if (i.third == "south") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.south_arrow)
+                }
+                else if (i.third == "north") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.north_arrow)
+                }
+            }
         }
     }
 }
