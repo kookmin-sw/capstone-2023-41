@@ -412,9 +412,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         var root1 = mutableListOf<Triple<Int, String, String>>()
         var root2 = mutableListOf<Triple<Int, String, String>>()
-        var firstfloor = 0
-        var lastfloor = 0
+        var startfloor = 0
+        var endfloor = 0
 
+        var check = 0
 
         if (startId != null && endId != null)
         {
@@ -428,15 +429,15 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             root = dijk.findShortestPath(dijk!!.makeGraph())
 
             if (root[0].first / 100 != floorid) {
-                firstfloor = root[0].first / 100
-                lastfloor = floorid
+                startfloor = root[0].first / 100
+                endfloor = floorid
 
                 for (i in root) {
-                    if (i.first / 100 == firstfloor) {
+                    if (i.first / 100 == startfloor) {
                         root1.add(i)
                     }
 
-                    else if (i.first / 100 == lastfloor) {
+                    else if (i.first / 100 == endfloor) {
                         root2.add(i)
                     }
                 }
@@ -448,7 +449,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             else {
                 testinfo.visibility = View.VISIBLE
 
-                spinner.setSelection(db.findIdxtoFloor(firstfloor, floorsIndoor))
+                spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
 
                 root = root1
 
@@ -458,14 +459,35 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 }, 1000)
 
                 testbtn.setOnClickListener(){
-                    spinner.setSelection(db.findIdxtoFloor(lastfloor, floorsIndoor))
+                    if (check == 0) {
+                        spinner.setSelection(db.findIdxtoFloor(endfloor, floorsIndoor))
 
-                    root = root2
+                        root = root2
 
-                    val handler = Handler()
-                    handler.postDelayed({
-                        makeLine()
-                    }, 1000)
+                        val handler = Handler()
+                        handler.postDelayed({
+                            makeLine()
+                        }, 1000)
+
+                        testbtn.text = "뒤로"
+
+                        check = 1
+                    }
+
+                    else if (check == 1) {
+                        spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
+
+                        root = root1
+
+                        val handler = Handler()
+                        handler.postDelayed({
+                            makeLine()
+                        }, 1000)
+
+                        testbtn.text = "탑승"
+
+                        check = 0
+                    }
                 }
             }
         }
