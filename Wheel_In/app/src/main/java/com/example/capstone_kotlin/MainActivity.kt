@@ -120,7 +120,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 두번째 서치뷰와 취소 버튼 레이아웃
         svAndCancel = findViewById(R.id.svAndCancel)
         // 자동완성
-//        val listView = findViewById<ListView>(R.id.listView1)
+        val listView1 = findViewById<ListView>(R.id.listView1)
+        val listView2 = findViewById<ListView>(R.id.listView2)
 
         // 정보창
         info = findViewById(R.id.info)
@@ -151,17 +152,22 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         map.maxScale = 1f
 
 
+
         // 자동 완성
-        var autoComplete = ArrayList<Int>()
+        var autoComplete = ArrayList<String>()
         for(i in nodesPlace){
-            autoComplete.add(i.id)
+            autoComplete.add(i.id.toString())
+            autoComplete.add(i.name)
         }
-        val ACadapter: ArrayAdapter<Int> = ArrayAdapter(this, android.R.layout.simple_list_item_1, autoComplete)
-//        listView.adapter = ACadapter
+        val ACadapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_1, autoComplete)
+        listView1.adapter = ACadapter
+        val autoCom = findViewById<FrameLayout>(R.id.autoCom)
+
+        val autoCom2 = findViewById<FrameLayout>(R.id.autoCom2)
+        listView2.adapter = ACadapter
 
         // 출발지와 목적지 입력 서치뷰 활성화.
         // 두번째 searchView 와 취소 버튼을 같이 나타나고 사라지게 조절.
-
         searchView1.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
                 ACadapter.filter.filter(newText)
@@ -176,7 +182,18 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         layoutParams.weight = 1.3f
                         searchView_layout.layoutParams = layoutParams
                     }
+                    // 입력창이 비어있으면 안보이게.
+                    autoCom.visibility = View.GONE
                 }
+                else if(newText.isNotEmpty()){
+                    autoCom.visibility = View.VISIBLE
+                    // 완전히 동일하게 입력되어도 확인을 누르기 전까진 안없어짐. -> 확인 안눌러도 완전이 동일하게 입력되면 안보이도록 수정.
+                    var temp = db.findPlacetoID(newText, nodesPlace)
+                    if(temp != null){
+                        autoCom.visibility = View.GONE
+                    }
+                }
+
                 return true
             }
 
@@ -193,8 +210,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         layoutParams.weight = 3f
                         searchView_layout.layoutParams = layoutParams
                         svAndCancel.visibility = View.VISIBLE
-                        val inputMethodManager =
-                            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        // 키보드 없애기
+                        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                         inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
                     }
                     else{
@@ -208,6 +225,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         searchView2.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
+                ACadapter.filter.filter(newText)
                 // searchView2의 입력 상태에 따라 처리
                 if (newText.isEmpty() && searchView1.query.isEmpty()) {
                     if(!interaction){
@@ -220,10 +238,21 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         layoutParams.weight = 1.3f
                         searchView_layout.layoutParams = layoutParams
                     }
+                    autoCom2.visibility = View.GONE
                 } else {
                     svAndCancel.visibility = View.VISIBLE
                     layoutParams.weight = 3f
                     searchView_layout.layoutParams = layoutParams
+                    autoCom2.visibility = View.VISIBLE
+                    if(newText.isNotEmpty()){
+                        autoCom2.visibility = View.VISIBLE
+                        if(db.findPlacetoID(newText, nodesPlace) != null){
+                            autoCom2.visibility = View.GONE
+                        }
+                    }
+                    else if(newText.isEmpty()){
+                        autoCom2.visibility = View.GONE
+                    }
                 }
                 return true
             }
@@ -233,8 +262,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 id = db.findPlacetoID(query, nodesPlace)
                 if(id != null){
                     showInfo(id)
-                    val inputMethodManager =
-                        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    // 키보드 없애기
+                    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
                 }
                 else{
@@ -243,6 +272,25 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 return true
             }
         })
+
+        // 자동완성 아이템 선택
+        listView1.setOnItemClickListener { parent, view, position, id ->
+            val selectedItem = parent.getItemAtPosition(position) // 선택된 아이템 가져오기
+            // 선택된 아이템에 대한 처리 로직을 작성하세요
+            // 예: 선택된 아이템을 텍스트뷰에 설정하거나 원하는 동작을 수행합니다
+            searchView1.setQuery(selectedItem.toString(), true)
+            // 자동완성 레이아웃을 숨깁니다
+            autoCom.visibility = View.GONE
+        }
+        listView2.setOnItemClickListener { parent, view, position, id ->
+            val selectedItem = parent.getItemAtPosition(position) // 선택된 아이템 가져오기
+            // 선택된 아이템에 대한 처리 로직을 작성하세요
+            // 예: 선택된 아이템을 텍스트뷰에 설정하거나 원하는 동작을 수행합니다
+            searchView2.setQuery(selectedItem.toString(), true)
+            // 자동완성 레이아웃을 숨깁니다
+            autoCom2.visibility = View.GONE
+        }
+
 
 
         // QR 촬영 버튼 활성화.
@@ -253,8 +301,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 취소 버튼 활성화.
         cancel.setOnClickListener{
-            searchView2.setQuery("", true)
-            searchView1.setQuery("", true)
+            searchView2.setQuery("", false)
+            searchView1.setQuery("", false)
             svAndCancel.visibility = View.GONE
             map.clearPin()
             map.clearStartPin()
@@ -332,7 +380,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 출발 버튼 누르면 searchView1 채우기
         start.setOnClickListener{
-            if(checkS2 == id?.name){
+            if(checkS2 == id?.name || checkS2 == id?.id.toString()){
                 searchView2.setQuery(null, true)
                 endId = null
                 map.clearEndPin()
@@ -350,7 +398,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 도착 버튼 누르면 searchView2 채우기
         end.setOnClickListener{
-            if(checkS1 == id?.name){
+            if(checkS1 == id?.name || checkS1 == id?.id.toString()){
                 searchView1.setQuery(null, true)
                 startId = null
                 map.clearStartPin()
@@ -403,6 +451,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 터치 이벤트
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                autoCom.visibility = View.GONE
+                autoCom2.visibility = View.GONE
+                // 키보드 없애기
+                val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
                 if(interaction){
                     var pointt = map.viewToSourceCoord(e.x, e.y);
                     var x = pointt!!.x/ratio
