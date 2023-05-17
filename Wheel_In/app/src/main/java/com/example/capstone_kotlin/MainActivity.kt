@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             interaction = true
 
             testinfo.visibility = View.GONE
+            testbtn.text = "탑승"
         }
 
         map = findViewById(R.id.map);
@@ -226,7 +227,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     map.clearStartPin()
                     map.clearEndPin()
                     map.clearPin("icon")
-                    addIcon(nodesPlace, nodesCross, floorid)
+                    addIcon(nodesPlace, floorid)
                 }
                 else if (selectedItem == "4층") {
                     drawableName = db.findMaptoFloor(4, floorsIndoor)
@@ -237,7 +238,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     map.clearStartPin()
                     map.clearEndPin()
                     map.clearPin("icon")
-                    addIcon(nodesPlace, nodesCross, floorid)
+                    addIcon(nodesPlace, floorid)
                 }
                 else if (selectedItem == "3층") {
                     drawableName = db.findMaptoFloor(3, floorsIndoor)
@@ -248,7 +249,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     map.clearStartPin()
                     map.clearEndPin()
                     map.clearPin("icon")
-                    addIcon(nodesPlace, nodesCross, floorid)
+                    addIcon(nodesPlace, floorid)
                 }
                 else {
                     Toast.makeText(applicationContext, "Selected item: $selectedItem", Toast.LENGTH_SHORT).show()
@@ -422,15 +423,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             interaction = false
             map.clearStartPin()
             map.clearEndPin()
-            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
 
             dijk = Dijkstra(nodesCross, startId!!.toInt(), endId!!.toInt())
             root = dijk.findShortestPath(dijk!!.makeGraph())
 
-            if (root[0].first / 100 != floorid) {
+            if (root[0].first / 100 != root[root.size - 1].first / 100) {
                 startfloor = root[0].first / 100
-                endfloor = floorid
+                endfloor = root[root.size - 1].first / 100
 
                 for (i in root) {
                     if (i.first / 100 == startfloor) {
@@ -444,6 +443,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             }
 
             if (root1.isEmpty()) {
+                map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
                 makeLine()
             }
             else {
@@ -455,6 +457,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                 val handler = Handler()
                 handler.postDelayed({
+                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
                     makeLine()
                 }, 1000)
 
@@ -466,6 +470,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                         val handler = Handler()
                         handler.postDelayed({
+                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
                             makeLine()
                         }, 1000)
 
@@ -481,6 +487,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                         val handler = Handler()
                         handler.postDelayed({
+                            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
                             makeLine()
                         }, 1000)
 
@@ -616,16 +624,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
     }
 
-    fun addIcon(nodesPlace: List<DataBaseHelper.PlaceNode>, nodesCross: List<DataBaseHelper.CrossNode>, floorId: Int) {
+    fun addIcon(nodesPlace: List<DataBaseHelper.PlaceNode>, floorId: Int) {
         for (i in nodesPlace) {
             if (i.id / 100 == floorId) {
                 map.addPin("icon", PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 0, R.drawable.icon, 2.0f, 2.0f, i.nickname)
-            }
-        }
-
-        for (i in nodesCross) {
-            if (i.id / 100 == floorId) {
-                map.addPin("icon", PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 0, R.drawable.icon, 2.0f, 2.0f)
             }
         }
     }
