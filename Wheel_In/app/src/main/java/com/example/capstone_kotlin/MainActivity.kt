@@ -4,17 +4,19 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent // Intent는 액티비티간 데이터를 전달하는데 사용된다.
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity // AppCompatActivity 클래스를 임포트. AppCompatActivity는 안드로이드 앱에서 사용되는 기본 클래스
 import android.os.Bundle // Bundle은 액티비티가 시스템에서 재생성될 때 데이터를 저장하고 다시 가져오는 데 사용
 import android.os.Handler
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -23,28 +25,9 @@ import androidx.core.content.ContextCompat
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
 
-// Activity 는 사용자와 상호작용 하기 위한 하나의 단위
 
-// 5/16 기준 검색 기능 활성화 및 뒤로가기 버튼 활성화.
-// 자동완성 기능 아직 미구현.
-// 자동완성 넣을 경우 화면 비율 조정 때문에 화면이 뭉개짐.
-// 위 두 기능 구현하면서 미처 발견한 여러 자잘한 문제 해결 및 아래 새로 발생한 문제 해결.
-
-// 현재 문제점
-// searchView1에 자주스 입력 후, 도착 버튼 누르면 s1, s2에 둘다 자주스가 입력됨. -> 해결
-// 근데 자주스를 가리키는 단어가 429, 자주스 두개라서 s1에 429 입력하고 도착 버튼 누를 시 s1엔 429, s2엔 자주스 입력됨
-// 지명을 어떻게 선정할 지 기준 필요.
-
-// 출발지와 도착지를 같게 설정하면, 취소를 누르기 전까지 터치가 먹히지 않음.
-// ex) 자주스 출발지로 선택 -> 테스트 목적지로 선택 -> 자주스 목적지로 선택 -> 터치 안먹음. -> 해결
-// 추가 문제 발생 : 자주스 출발지 선택 -> 자주스 목적지 선택 -> 엘리베이터 목적지 선택 시 터치 안먹음. -> 해결
-// 추가 문제 발생 : 위 문제 과정 후, 자주스 출발 지 선택 시 목적지 사라짐. -> 해결
-// 위 문제에서 터치로 자주스 선택 시 서치뷰, 취소버튼 invisible -> 해결
-// 추가 문제 발생 : 자주스 출발 -> 엘리베이터 도착 -> 자주스 도착 선택 시 터치 안먹음. -> 해결
-
-// 뒤로가기 버튼 구현 후, 장소 한 곳 터치 -> 활성화된 정보창 뒤로가기로 제거 -> 다른 장소 터치 -> 기존 장소 핀 유지 문제 발생 -> 해결
-
-
+// 현재 문제점 (5/18, 12:54)
+// 3층 지도를 띄운 후, 자율주행 스튜디오를 검색하면 3층 지도에 자주스가 찍힘.
 
 
 
@@ -60,9 +43,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var cancel: Button
     private lateinit var svAndCancel: LinearLayout
 
-    private lateinit var svAdapter: ArrayAdapter<String>
 
-
+    // 출발지 목적지 같은 값이 들어가지 않게 확인하는 변수
     private var checkS1: String? = null
     private var checkS2: String? = null
 
@@ -73,20 +55,35 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var infoText1: TextView
     private lateinit var infoText2: TextView
 
+    private lateinit var spinner: Spinner
+
+    private lateinit var testinfo: FrameLayout
+    private lateinit var testbtn: Button
+
     // QR 촬영으로 값 받아올 변수
     private var id: DataBaseHelper.PlaceNode? = null
+
+    // 교차로 터치 이벤트 변수
+    private var cross: DataBaseHelper.CrossNode? = null
 
     // 터치 처리
     private lateinit var gestureDetector: GestureDetector
 
     // DB
     private lateinit var db: DataBaseHelper
+
     private lateinit var floorsIndoor: List<DataBaseHelper.IndoorFloor>
     private lateinit var nodesPlace: List<DataBaseHelper.PlaceNode>
     private lateinit var nodesCross: List<DataBaseHelper.CrossNode>
 
     // 길찾기
     private lateinit var dijk: Dijkstra
+
+    private lateinit var root: List<Triple<Int, String, String>>
+
+    // 건물 정보 기본 set
+    private var placeid: Int = 1
+    private var floorid: Int = 4
 
     // 지도 좌표 비율
     var ratio = 0F
@@ -103,10 +100,18 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     override fun onCreate(savedInstanceState: Bundle?) { // onCreate 함수를 오버라이드. 이 함수는 액티비티가 생성될 때 호출됨.
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
+
+        // DB
+        db = DataBaseHelper(this)
+        nodesPlace = db.getNodesPlace()
+        nodesCross = db.getNodesCross()
+        floorsIndoor = db.getFloorsIndoor()
+
         setContentView(R.layout.activity_main)
 
         // 지도
         map = findViewById(R.id.map)
+
 
         // 서치뷰, QR, 취소 버튼 레이아웃
         // 출발지, 목적지 입력 서치뷰
@@ -114,7 +119,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         searchView2 = findViewById(R.id.searchView2)
         // 두번째 searchView와 취소버튼이 나타남에 따라 레이아웃 비율 조절.
         searchView_layout = findViewById(R.id.searchView_layout)
-        var layoutParams = searchView_layout.layoutParams as LinearLayout.LayoutParams
+
         // 취소 버튼
         cancel = findViewById(R.id.cancel)
         // 두번째 서치뷰와 취소 버튼 레이아웃
@@ -123,9 +128,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         val listView1 = findViewById<ListView>(R.id.listView1)
         val listView2 = findViewById<ListView>(R.id.listView2)
 
+
         // 정보창
         info = findViewById(R.id.info)
-
         // 정보창에 띄울 정보들
         infoText1 = findViewById(R.id.text1)
         infoText2 = findViewById(R.id.text2)
@@ -133,23 +138,27 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         infoPic1 = findViewById(R.id.infoPic1)
         infoPic2 = findViewById(R.id.infoPic2)
 
+
+        // 출발, 도착 버튼
+        var start = findViewById<Button>(R.id.start)
+        var end = findViewById<Button>(R.id.end)
+
+
+
         // QR 촬영 버튼
         var qrButton: Button = findViewById(R.id.qrButton)
 
-        // DB
-        db = DataBaseHelper(this)
-        nodesPlace = db.getNodesPlace()
-        nodesCross = db.getNodesCross()
-        floorsIndoor = db.getFloorsIndoor()
+
+        // 층 수 스피너
+        spinner = findViewById(R.id.spinner)
 
 
 
-        // 지도 설정
-        val drawableName = db.findMaptoFloor(4, floorsIndoor)
-        val drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
-        map.setImage(ImageSource.resource(drawableId))
         // 지도 크기 제한
         map.maxScale = 1f
+
+        // 화면 비율
+        ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
 
 
 
@@ -166,6 +175,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         val autoCom2 = findViewById<FrameLayout>(R.id.autoCom2)
         listView2.adapter = ACadapter
 
+
+
         // 출발지와 목적지 입력 서치뷰 활성화.
         // 두번째 searchView 와 취소 버튼을 같이 나타나고 사라지게 조절.
         searchView1.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -173,14 +184,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 ACadapter.filter.filter(newText)
                 if (newText.isEmpty() && searchView2.query.isEmpty()) {
                     if(!interaction){
-                        svAndCancel.visibility = View.VISIBLE
-                        layoutParams.weight = 3f
-                        searchView_layout.layoutParams = layoutParams
+                        setSearchLayout(View.VISIBLE)
                     }
                     else{
-                        svAndCancel.visibility = View.GONE
-                        layoutParams.weight = 1.3f
-                        searchView_layout.layoutParams = layoutParams
+                        setSearchLayout(View.GONE)
                     }
                     // 입력창이 비어있으면 안보이게.
                     autoCom.visibility = View.GONE
@@ -199,17 +206,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (query.isEmpty() && searchView2.query.isEmpty()) {
-                    svAndCancel.visibility = View.GONE
-                    layoutParams.weight = 1.3f
-                    searchView_layout.layoutParams = layoutParams
+                    setSearchLayout(View.GONE)
                 } else {
                     checkS1 = query
                     id = db.findPlacetoID(query, nodesPlace)
                     if(id != null){
                         showInfo(id)
-                        layoutParams.weight = 3f
-                        searchView_layout.layoutParams = layoutParams
-                        svAndCancel.visibility = View.VISIBLE
+                        setSearchLayout(View.VISIBLE)
                         // 키보드 없애기
                         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                         inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
@@ -229,20 +232,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 // searchView2의 입력 상태에 따라 처리
                 if (newText.isEmpty() && searchView1.query.isEmpty()) {
                     if(!interaction){
-                        svAndCancel.visibility = View.VISIBLE
-                        layoutParams.weight = 3f
-                        searchView_layout.layoutParams = layoutParams
+                        setSearchLayout(View.VISIBLE)
                     }
                     else{
-                        svAndCancel.visibility = View.GONE
-                        layoutParams.weight = 1.3f
-                        searchView_layout.layoutParams = layoutParams
+                        setSearchLayout(View.GONE)
                     }
                     autoCom2.visibility = View.GONE
                 } else {
-                    svAndCancel.visibility = View.VISIBLE
-                    layoutParams.weight = 3f
-                    searchView_layout.layoutParams = layoutParams
+                    setSearchLayout(View.VISIBLE)
                     autoCom2.visibility = View.VISIBLE
                     if(newText.isNotEmpty()){
                         autoCom2.visibility = View.VISIBLE
@@ -303,7 +300,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         cancel.setOnClickListener{
             searchView2.setQuery("", false)
             searchView1.setQuery("", false)
-            svAndCancel.visibility = View.GONE
+            setSearchLayout(View.GONE)
             map.clearPin()
             map.clearStartPin()
             map.clearEndPin()
@@ -311,11 +308,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             startId = null
             endId = null
 
-            svAndCancel.visibility = View.GONE
-            layoutParams.weight = 1.3f
-            searchView_layout.layoutParams = layoutParams
-
             interaction = true
+
+            testinfo.visibility = View.GONE
+            testbtn.text = "탑승"
         }
 
 
@@ -374,9 +370,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             // 해당 이벤트를 소비하고, map의 onTouchEvent를 호출하지 않도록 합니다.
             true
         }
-        // 출발, 도착 버튼
-        var start = findViewById<Button>(R.id.start)
-        var end = findViewById<Button>(R.id.end)
 
         // 출발 버튼 누르면 searchView1 채우기
         start.setOnClickListener{
@@ -416,36 +409,92 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
 
 
+
         // 비상 연락망 변수 추가
         val btn_emergency: Button = findViewById(R.id.btn_emergency)
         btn_emergency.setOnClickListener {
             showEmergencyPopup()
         }
 
-        // 층 수 스피너
-        val spinner: Spinner = findViewById(R.id.spinner)
         // 스피너에 항목 추가.
         val items: MutableList<String> = ArrayList()
-        items.add("미래관 4층")
-        items.add("미래관 3층")
-        items.add("미래관 2층")
+
+        for (i in floorsIndoor) {
+            if (i.placeid == placeid) {
+                items.add(i.name)
+            }
+        }
+
         // 스피너 활성화
         val adapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
 
+        spinner.setSelection(1)
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                var drawableName: String?
+                var drawableId: Int?
                 val selectedItem: String = parent.getItemAtPosition(position) as String
+                val sss = parent.getItemAtPosition(position) as String
                 if (selectedItem == "Add New Item") {
                     // Do something
-                } else {
-                    Toast.makeText(applicationContext, "Selected item: $selectedItem", Toast.LENGTH_SHORT).show()
                 }
+
+
+                var floorNum = selectedItem.substring(0,1).toInt()
+                drawableName = db.findMaptoFloor(floorNum, floorsIndoor)
+                drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
+                floorid = floorNum
+                map.setImage(ImageSource.resource(drawableId))
+                map.clearPin()
+                map.clearStartPin()
+                map.clearEndPin()
+                map.clearPin("icon")
+                addIcon(nodesPlace, floorid)
+
+//                else if (selectedItem == "5층") {
+//                    drawableName = db.findMaptoFloor(5, floorsIndoor)
+//                    drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
+//                    floorid = 5
+//                    map.setImage(ImageSource.resource(drawableId))
+//                    map.clearPin()
+//                    map.clearStartPin()
+//                    map.clearEndPin()
+//                    map.clearPin("icon")
+//                    addIcon(nodesPlace, floorid)
+//                }
+//                else if (selectedItem == "4층") {
+//                    drawableName = db.findMaptoFloor(4, floorsIndoor)
+//                    drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
+//                    floorid = 4
+//                    map.setImage(ImageSource.resource(drawableId))
+//                    map.clearPin()
+//                    map.clearStartPin()
+//                    map.clearEndPin()
+//                    map.clearPin("icon")
+//                    addIcon(nodesPlace, floorid)
+//                }
+//                else if (selectedItem == "3층") {
+//                    drawableName = db.findMaptoFloor(3, floorsIndoor)
+//                    drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
+//                    floorid = 3
+//                    map.setImage(ImageSource.resource(drawableId))
+//                    map.clearPin()
+//                    map.clearStartPin()
+//                    map.clearEndPin()
+//                    map.clearPin("icon")
+//                    addIcon(nodesPlace, floorid)
+//                }
+//                else {
+//                    Toast.makeText(applicationContext, "Selected item: $selectedItem", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+
 
 
         // 터치 이벤트
@@ -460,9 +509,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var pointt = map.viewToSourceCoord(e.x, e.y);
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
-                    id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace)
+
+                    id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace, floorid)
                     if (id != null)
                     {
+                        map.clearPin()
                         showInfo(id)
                     }
                     else if(id == null){
@@ -471,7 +522,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     return true
                 }
                 else{
-                    return false
+                    var pointt = map.viewToSourceCoord(e.x, e.y);
+                    var x = pointt!!.x/ratio
+                    var y = pointt!!.y/ratio
+                    cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
+                    if (cross != null) {
+                        showCross(cross, root)
+                    }
+                    else if (cross == null) {
+                        showCross(null, root)
+                    }
+                    return true
                 }
             }
         })
@@ -480,15 +541,25 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 motionEvent
             )
         })
-
-
-
-        // 화면 비율
-        ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
-
-
     }
 
+
+    // 서치뷰 레이아웃 조절
+    fun setSearchLayout(v: Int){
+        var layoutParams = searchView_layout.layoutParams as LinearLayout.LayoutParams
+        if(v == View.VISIBLE){
+            svAndCancel.visibility = View.VISIBLE
+            layoutParams.weight = 3f
+            searchView_layout.layoutParams = layoutParams
+        }
+        else{
+            svAndCancel.visibility = View.GONE
+            layoutParams.weight = 1.3f
+            searchView_layout.layoutParams = layoutParams
+        }
+    }
+
+    // 뒤로가기 버튼
     override fun onBackPressed() {
         if(info.visibility == View.VISIBLE){
             info.visibility = View.GONE
@@ -507,45 +578,100 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }, 2000)
     }
 
+
+    // 길 찾기
     fun mapInit()
     {
+        testinfo = findViewById(R.id.testinfo)
+        testbtn = findViewById(R.id.testbtn)
 
         var scid = db.findCrosstoID(startId?.toInt(), nodesCross)
         var ecid = db.findCrosstoID(endId?.toInt(), nodesCross)
 
-        if (startId == endId){
-            interaction = true
-            return
-        }
+        var root1 = mutableListOf<Triple<Int, String, String>>()
+        var root2 = mutableListOf<Triple<Int, String, String>>()
+        var startfloor = 0
+        var endfloor = 0
+
+        var check = 0
+
         if (startId != null && endId != null)
         {
             interaction = false
             map.clearStartPin()
             map.clearEndPin()
-            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
 
             dijk = Dijkstra(nodesCross, startId!!.toInt(), endId!!.toInt())
-            var root = dijk.findShortestPath(dijk!!.makeGraph())
-            for (i in root)
-            {
-                var pointt = db.findCrosstoID(i.first, nodesCross!!)
-                var tempX = pointt!!.x.toFloat()*ratio
-                var tempY = pointt!!.y.toFloat()*ratio
-                map.addLine(PointF(tempX, tempY), Color.GREEN)
+            root = dijk.findShortestPath(dijk!!.makeGraph())
 
-                if ((i.first % 100) > 70) {
-                    if (i.third == "east") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.east_arrow)
+            if (root[0].first / 100 != root[root.size - 1].first / 100) {
+                startfloor = root[0].first / 100
+                endfloor = root[root.size - 1].first / 100
+
+                for (i in root) {
+                    if (i.first / 100 == startfloor) {
+                        root1.add(i)
                     }
-                    else if (i.third == "west") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.west_arrow)
+
+                    else if (i.first / 100 == endfloor) {
+                        root2.add(i)
                     }
-                    else if (i.third == "south") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.south_arrow)
+                }
+            }
+
+            if (root1.isEmpty()) {
+                map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
+                makeLine()
+            }
+            else {
+                testinfo.visibility = View.VISIBLE
+
+                spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
+
+                root = root1
+
+                val handler = Handler()
+                handler.postDelayed({
+                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
+                    makeLine()
+                }, 1000)
+
+                testbtn.setOnClickListener(){
+                    if (check == 0) {
+                        spinner.setSelection(db.findIdxtoFloor(endfloor, floorsIndoor))
+
+                        root = root2
+
+                        val handler = Handler()
+                        handler.postDelayed({
+                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
+                            makeLine()
+                        }, 1000)
+
+                        testbtn.text = "뒤로"
+
+                        check = 1
                     }
-                    else if (i.third == "north") {
-                        map.addPin(PointF(tempX, tempY), 1, R.drawable.north_arrow)
+
+                    else if (check == 1) {
+                        spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
+
+                        root = root1
+
+                        val handler = Handler()
+                        handler.postDelayed({
+                            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
+                            makeLine()
+                        }, 1000)
+
+                        testbtn.text = "탑승"
+
+                        check = 0
                     }
                 }
             }
@@ -560,8 +686,18 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val returnedData = data?.getStringExtra("QRdata")
             Toast.makeText(this, returnedData, Toast.LENGTH_SHORT).show()
-            id = db.findPlacetoID(returnedData!!, nodesPlace)
-            showInfo(id)
+            val parts = returnedData!!.split(" ")
+            placeid = parts[0].toInt()
+            floorid = parts[1].toInt() / 100
+
+            spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+
+            id = db.findPlacetoID(parts[1], nodesPlace)
+
+            val handler = Handler()
+            handler.postDelayed({
+                showInfo(id)
+            }, 1000)
         }
     }
 
@@ -619,8 +755,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             info.visibility = View.VISIBLE
 
             map.animateScaleAndCenter(1f,PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio))?.start()
-            map.clearPin()
             map.addPin(PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
             return
         }
         else{
@@ -628,6 +764,123 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map.clearPin()
         }
     }
+
+    fun showCross(cross: DataBaseHelper.CrossNode?, root: List<Triple<Int, String, String>>) {
+        if (cross != null) {
+            for (i in root) {
+                if (cross.id == i.first) {
+                    // 정보 사진
+                    if (i.second == "east") {
+                        infoPic1.setImageBitmap(cross.imgEast)
+                    }
+                    else if (i.second == "west") {
+                        infoPic1.setImageBitmap(cross.imgWest)
+                    }
+                    else if (i.second == "south") {
+                        infoPic1.setImageBitmap(cross.imgSouth)
+                    }
+                    else if (i.second == "north") {
+                        infoPic1.setImageBitmap(cross.imgNorth)
+                    }
+
+                    infoPic2.setImageResource(choiceArrow(i.second, i.third))
+
+                    break
+                }
+            }
+
+            // 지명
+            infoText1.setText(cross?.nodes.toString())
+            info.visibility = View.VISIBLE
+
+            map.animateScaleAndCenter(1f,PointF(cross.x.toFloat()*ratio, cross.y.toFloat()*ratio))?.start()
+            return
+        }
+        else{
+            info.visibility = View.GONE
+        }
+    }
+
+    fun addIcon(nodesPlace: List<DataBaseHelper.PlaceNode>, floorId: Int) {
+        for (i in nodesPlace) {
+            if (i.id / 100 == floorId) {
+                map.addPin("icon", PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 0, R.drawable.icon, 2.0f, 2.0f, i.nickname)
+            }
+        }
+    }
+
+    fun choiceArrow(second: String, third: String): Int {
+        if (second == "east") {
+            if (third == "south") {
+                return R.drawable.east_arrow
+            }
+            else if (third == "north") {
+                return R.drawable.west_arrow
+            }
+            else {
+                return R.drawable.north_arrow
+            }
+        }
+        else if (second == "west") {
+            if (third == "north") {
+                return R.drawable.east_arrow
+            }
+            else if (third == "south") {
+                return R.drawable.west_arrow
+            }
+            else {
+                return R.drawable.north_arrow
+            }
+        }
+        else if (second == "south") {
+            if (third == "west") {
+                return R.drawable.east_arrow
+            }
+            else if (third == "east") {
+                return R.drawable.west_arrow
+            }
+            else {
+                return R.drawable.north_arrow
+            }
+        }
+        else if (second == "north") {
+            if (third == "east") {
+                return R.drawable.east_arrow
+            }
+            else if (third == "west") {
+                return R.drawable.west_arrow
+            }
+            else {
+                return R.drawable.north_arrow
+            }
+        }
+        else {
+            return 0
+        }
+    }
+
+    fun makeLine() {
+        for (i in root)
+        {
+            var pointt = db.findCrosstoID(i.first, nodesCross!!)
+            var tempX = pointt!!.x.toFloat()*ratio
+            var tempY = pointt!!.y.toFloat()*ratio
+            map.addLine(PointF(tempX, tempY), Color.GREEN)
+
+            if ((i.first % 100) > 70) {
+                if (i.third == "east") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.east_arrow)
+                }
+                else if (i.third == "west") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.west_arrow)
+                }
+                else if (i.third == "south") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.south_arrow)
+                }
+                else if (i.third == "north") {
+                    map.addPin(PointF(tempX, tempY), 1, R.drawable.north_arrow)
+                }
+            }
+        }
+    }
 }
-
-

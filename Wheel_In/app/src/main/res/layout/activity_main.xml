@@ -7,7 +7,6 @@
     android:scrollbarSize="10dp"
     tools:context=".MainActivity">
 
-
     <!--    화면 전체 레이아웃-->
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,16 +27,15 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-
-                    <SearchView
-                        android:id="@+id/searchView1"
-                        android:layout_width="280dp"
-                        android:layout_height="70dp"
-                        android:queryHint="목적지를 입력하세요."
-                        android:iconifiedByDefault="false"
-                        android:background="@drawable/searchview_radious"
-                        android:layout_margin="5dp"
-                        />
+                <SearchView
+                    android:id="@+id/searchView1"
+                    android:layout_width="280dp"
+                    android:layout_height="70dp"
+                    android:queryHint="목적지를 입력하세요."
+                    android:iconifiedByDefault="false"
+                    android:background="@drawable/searchview_radious"
+                    android:layout_margin="5dp"
+                    />
 
                 <Button
                     android:id="@+id/qrButton"
@@ -159,7 +157,7 @@
     </LinearLayout>
     <!--    화면 전체 레이아웃 끝-->
 
-<!--    자동 완성 레이아웃 -->
+    <!--    자동 완성 레이아웃 -->
     <FrameLayout
         android:id="@+id/autoCom"
         android:layout_width="280dp"
@@ -206,6 +204,25 @@
             />
 
     </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/testinfo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/testbtn"
+            android:layout_width="77dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:text="탑승">
+
+        </Button>
+
+    </FrameLayout>
+
+
 
     <!--    정보창 전체 레이아웃-->
     <FrameLayout
@@ -298,7 +315,6 @@
 
     </FrameLayout>
     <!--    정보창 전체 레이아웃 끝-->
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
