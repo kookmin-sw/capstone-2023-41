@@ -222,6 +222,27 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="620dp"
+                android:id="@+id/plus"
+                android:text="+"/>
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="620dp"
+                android:id="@+id/minus"
+                android:text="-"/>
+
+    </FrameLayout>
 
 
     <!--    정보창 전체 레이아웃-->
