@@ -4,9 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent // Intent는 액티비티간 데이터를 전달하는데 사용된다.
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.PointF
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.opengl.Visibility
@@ -97,6 +95,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // 뒤로 가기 버튼
     private var doubleBackToExitPressedOnce = false
+
+    // 지도 크기
+    var mScale = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) { // onCreate 함수를 오버라이드. 이 함수는 액티비티가 생성될 때 호출됨.
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
@@ -218,11 +219,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
 
                         floorid = id!!.id / 100
-
                         spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
-
-                        showInfo(id)
-
+                        val handler = Handler()
+                        handler.postDelayed({
+                            showInfo(id)
+                        }, 500)
                     }
                     else{
                         Toast.makeText(applicationContext, "입력하신 장소가 없습니다.", Toast.LENGTH_SHORT).show()
@@ -265,10 +266,16 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 checkS2 = query
                 id = db.findPlacetoID(query, nodesPlace)
                 if(id != null){
-                    showInfo(id)
                     // 키보드 없애기
                     val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
+
+                    floorid = id!!.id / 100
+                    spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+                    val handler = Handler()
+                    handler.postDelayed({
+                        showInfo(id)
+                    }, 500)
                 }
                 else{
                     Toast.makeText(applicationContext, "입력하신 장소가 없습니다.", Toast.LENGTH_SHORT).show()
@@ -381,13 +388,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 출발 버튼 누르면 searchView1 채우기
         start.setOnClickListener{
             if(checkS2 == id?.name || checkS2 == id?.id.toString()){
-                searchView2.setQuery(null, true)
+                searchView2.setQuery(null, false)
                 endId = null
                 map.clearEndPin()
                 interaction = true
             }
             checkS1 = id?.name
-            searchView1.setQuery(id?.name, true)
+            searchView1.setQuery(id?.name, false)
+            setSearchLayout(View.VISIBLE)
             startId = id?.id.toString()
             map.clearStartPin()
             map.clearPin()
@@ -399,13 +407,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 도착 버튼 누르면 searchView2 채우기
         end.setOnClickListener{
             if(checkS1 == id?.name || checkS1 == id?.id.toString()){
-                searchView1.setQuery(null, true)
+                searchView1.setQuery(null, false)
                 startId = null
                 map.clearStartPin()
                 interaction = true
             }
             checkS2 = id?.name
-            searchView2.setQuery(id?.name, true)
+            searchView2.setQuery(id?.name, false)
             map.clearPin()
             map.clearEndPin()
             map.addEndPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
@@ -415,6 +423,25 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
 
 
+        // 확대 축소 버튼
+        val plus: Button = findViewById(R.id.plus)
+        val minus: Button = findViewById(R.id.minus)
+
+
+        plus.setOnClickListener{
+            val visibleRect = Rect()
+
+//            val tempRect = map.visibleFileRect(visibleRect)
+            val centerX = (visibleRect.left + visibleRect.right) / 2f
+            val centerY = (visibleRect.top + visibleRect.bottom) / 2f
+            mScale += 0.4f
+            map.animateScaleAndCenter(mScale, PointF(centerX, centerY))?.start()
+
+        }
+        minus.setOnClickListener{
+            mScale -= 0.4f
+            map.animateScaleAndCenter(mScale, PointF(map.width*ratio, (map.height/2)*ratio))?.start()
+        }
 
 
         // 비상 연락망 변수 추가
@@ -456,14 +483,18 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 floorid = floorNum
                 map.setImage(ImageSource.resource(drawableId))
 
-
                 map.clearPin()
                 map.clearStartPin()
                 map.clearEndPin()
                 map.clearPin("icon")
                 addIcon(nodesPlace, floorid)
 
-
+//                if(interaction){
+//                    val handler = Handler()
+//                    handler.postDelayed({
+//                        map.animateScaleAndCenter(0.5f,PointF(map.width*ratio, map.height*ratio))?.start()
+//                    }, 500)
+//                }
             }
 
 
@@ -625,7 +656,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                             map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
 
                             makeLine()
-                        }, 1000)
+                        }, 500)
 
                         testbtn.text = "뒤로"
 
@@ -642,7 +673,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                             map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
 
                             makeLine()
-                        }, 1000)
+                        }, 500)
 
                         testbtn.text = "탑승"
 
@@ -672,7 +703,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             val handler = Handler()
             handler.postDelayed({
                 showInfo(id)
-            }, 1000)
+            }, 600)
+
         }
     }
 
