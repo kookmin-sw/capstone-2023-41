@@ -211,11 +211,18 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     checkS1 = query
                     id = db.findPlacetoID(query, nodesPlace)
                     if(id != null){
-                        showInfo(id)
+
                         setSearchLayout(View.VISIBLE)
                         // 키보드 없애기
                         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                         inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
+
+                        floorid = id!!.id / 100
+
+                        spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+
+                        showInfo(id)
+
                     }
                     else{
                         Toast.makeText(applicationContext, "입력하신 장소가 없습니다.", Toast.LENGTH_SHORT).show()
@@ -448,49 +455,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                 floorid = floorNum
                 map.setImage(ImageSource.resource(drawableId))
+
+
                 map.clearPin()
                 map.clearStartPin()
                 map.clearEndPin()
                 map.clearPin("icon")
                 addIcon(nodesPlace, floorid)
 
-//                else if (selectedItem == "5층") {
-//                    drawableName = db.findMaptoFloor(5, floorsIndoor)
-//                    drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
-//                    floorid = 5
-//                    map.setImage(ImageSource.resource(drawableId))
-//                    map.clearPin()
-//                    map.clearStartPin()
-//                    map.clearEndPin()
-//                    map.clearPin("icon")
-//                    addIcon(nodesPlace, floorid)
-//                }
-//                else if (selectedItem == "4층") {
-//                    drawableName = db.findMaptoFloor(4, floorsIndoor)
-//                    drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
-//                    floorid = 4
-//                    map.setImage(ImageSource.resource(drawableId))
-//                    map.clearPin()
-//                    map.clearStartPin()
-//                    map.clearEndPin()
-//                    map.clearPin("icon")
-//                    addIcon(nodesPlace, floorid)
-//                }
-//                else if (selectedItem == "3층") {
-//                    drawableName = db.findMaptoFloor(3, floorsIndoor)
-//                    drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
-//                    floorid = 3
-//                    map.setImage(ImageSource.resource(drawableId))
-//                    map.clearPin()
-//                    map.clearStartPin()
-//                    map.clearEndPin()
-//                    map.clearPin("icon")
-//                    addIcon(nodesPlace, floorid)
-//                }
-//                else {
-//                    Toast.makeText(applicationContext, "Selected item: $selectedItem", Toast.LENGTH_SHORT).show()
-//                }
+
             }
+
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
