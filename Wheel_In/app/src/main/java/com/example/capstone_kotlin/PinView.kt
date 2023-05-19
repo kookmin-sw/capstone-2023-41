@@ -206,8 +206,8 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
             val vX = vPin.x - image!!.width / i.width //(/2가 없는 경우 해당 좌표기준 좌측 위로 이미지가 생성됨)
             val vY = vPin.y - image!!.height / i.height
             canvas.drawBitmap(image!!, vX, vY, paint)
-            myPaint.setColor(Color.RED)
-            canvas.drawText(i.text, vPin.x, vPin.y+myPaint.textSize, myPaint)
+            myPaint.setColor(Color.BLUE)
+            canvas.drawText(i.text, vPin.x, vPin.y+myPaint.textSize+20, myPaint)
         }
     }
 
