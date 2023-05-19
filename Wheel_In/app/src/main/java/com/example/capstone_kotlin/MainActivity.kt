@@ -24,10 +24,6 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
 
 
-// 현재 문제점 (5/18, 12:54)
-// 3층 지도를 띄운 후, 자율주행 스튜디오를 검색하면 3층 지도에 자주스가 찍힘.
-
-
 
 class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActivity 클래스를 상속받음
 
@@ -430,17 +426,21 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         plus.setOnClickListener{
             val visibleRect = Rect()
-
-//            val tempRect = map.visibleFileRect(visibleRect)
+            map.visibleFileRect(visibleRect)
             val centerX = (visibleRect.left + visibleRect.right) / 2f
             val centerY = (visibleRect.top + visibleRect.bottom) / 2f
-            mScale += 0.4f
+            mScale = map.scale
+            mScale += 0.3f
             map.animateScaleAndCenter(mScale, PointF(centerX, centerY))?.start()
-
         }
         minus.setOnClickListener{
-            mScale -= 0.4f
-            map.animateScaleAndCenter(mScale, PointF(map.width*ratio, (map.height/2)*ratio))?.start()
+            val visibleRect = Rect()
+            map.visibleFileRect(visibleRect)
+            val centerX = (visibleRect.left + visibleRect.right) / 2f
+            val centerY = (visibleRect.top + visibleRect.bottom) / 2f
+            mScale = map.scale
+            mScale -= 0.3f
+            map.animateScaleAndCenter(mScale, PointF(centerX, centerY))?.start()
         }
 
 
