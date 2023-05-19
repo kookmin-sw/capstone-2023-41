@@ -234,7 +234,7 @@ class DataBaseHelper(private val context: Context) :
         return null
     }
 
-    fun findCrosstoID(id: Double, list: List<CrossNode>): CrossNode? {
+    fun findCrosstoID(id: Double?, list: List<CrossNode>): CrossNode? {
         for (i in list) {
             if (i.id == id) {
                 return i

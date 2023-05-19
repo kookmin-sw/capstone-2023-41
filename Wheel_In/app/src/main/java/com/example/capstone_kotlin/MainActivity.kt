@@ -24,11 +24,6 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
 
 
-// 현재 문제점 (5/18, 12:54)
-// 3층 지도를 띄운 후, 자율주행 스튜디오를 검색하면 3층 지도에 자주스가 찍힘.
-
-
-
 class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActivity 클래스를 상속받음
 
     // 지도
@@ -55,8 +50,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     private lateinit var spinner: Spinner
 
-    private lateinit var testinfo: FrameLayout
-    private lateinit var testbtn: Button
+    private lateinit var info_elvt: LinearLayout
+
+    private lateinit var btn_back: Button
+    private lateinit var btn_elvt: Button
 
     // QR 촬영으로 값 받아올 변수
     private var id: DataBaseHelper.PlaceNode? = null
@@ -169,7 +166,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 자동 완성
         var autoComplete = ArrayList<String>()
         for(i in nodesPlace){
-            if (i.nickname != "화장실" || i.nickname != "엘리베이터") {
+            if (i.nickname != "화장실" && i.nickname != "엘리베이터") {
                 autoComplete.add(i.nickname)
             }
             autoComplete.add(i.name)
@@ -200,11 +197,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 }
                 else if(newText.isNotEmpty()){
                     autoCom.visibility = View.VISIBLE
-                    // 완전히 동일하게 입력되어도 확인을 누르기 전까진 안없어짐. -> 확인 안눌러도 완전이 동일하게 입력되면 안보이도록 수정.
-                    var temp = db.searchPlace(newText, nodesPlace)
-                    if(temp != null){
-                        autoCom.visibility = View.GONE
-                    }
                 }
 
                 return true
@@ -256,9 +248,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     autoCom2.visibility = View.VISIBLE
                     if(newText.isNotEmpty()){
                         autoCom2.visibility = View.VISIBLE
-                        if(db.searchPlace(newText, nodesPlace) != null){
-                            autoCom2.visibility = View.GONE
-                        }
                     }
                     else if(newText.isEmpty()){
                         autoCom2.visibility = View.GONE
@@ -320,17 +309,19 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             searchView2.setQuery("", false)
             searchView1.setQuery("", false)
             setSearchLayout(View.GONE)
+
             map.clearPin()
-            map.clearStartPin()
-            map.clearEndPin()
+            map.cleanOtherPin("icon")
 
             startId = null
             endId = null
 
             interaction = true
 
-            testinfo.visibility = View.GONE
-            testbtn.text = "탑승"
+            info_elvt.visibility = View.GONE
+
+            btn_elvt.visibility = View.VISIBLE
+            btn_back.visibility = View.GONE
         }
 
 
@@ -435,17 +426,21 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         plus.setOnClickListener{
             val visibleRect = Rect()
-
-//            val tempRect = map.visibleFileRect(visibleRect)
+            map.visibleFileRect(visibleRect)
             val centerX = (visibleRect.left + visibleRect.right) / 2f
             val centerY = (visibleRect.top + visibleRect.bottom) / 2f
-            mScale += 0.4f
+            mScale = map.scale
+            mScale += 0.3f
             map.animateScaleAndCenter(mScale, PointF(centerX, centerY))?.start()
-
         }
         minus.setOnClickListener{
-            mScale -= 0.4f
-            map.animateScaleAndCenter(mScale, PointF(map.width*ratio, (map.height/2)*ratio))?.start()
+            val visibleRect = Rect()
+            map.visibleFileRect(visibleRect)
+            val centerX = (visibleRect.left + visibleRect.right) / 2f
+            val centerY = (visibleRect.top + visibleRect.bottom) / 2f
+            mScale = map.scale
+            mScale -= 0.3f
+            map.animateScaleAndCenter(mScale, PointF(centerX, centerY))?.start()
         }
 
 
@@ -489,8 +484,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 map.setImage(ImageSource.resource(drawableId))
 
                 map.clearPin()
-                map.clearStartPin()
-                map.clearEndPin()
+                map.cleanOtherPin("icon")
                 map.clearPin("icon")
                 addIcon(nodesPlace, floorid)
 
@@ -538,7 +532,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var y = pointt!!.y/ratio
                     cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
                     if (cross != null) {
-                        showCross(cross, root)
+                        for (i in root) {
+                            if ((cross!!.id.toInt() % 100 > 70 && cross!!.id == i.first) || cross!!.id == startId || cross!!.id == endId) {
+                                showCross(cross, root)
+                            }
+                        }
                     }
                     else if (cross == null) {
                         showCross(null, root)
@@ -593,18 +591,23 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     // 길 찾기
     fun mapInit()
     {
-        testinfo = findViewById(R.id.testinfo)
-        testbtn = findViewById(R.id.testbtn)
+        info_elvt = findViewById(R.id.info_elvt)
 
-        var scid = db.findCrosstoID(startId!!, nodesCross)
-        var ecid = db.findCrosstoID(endId!!, nodesCross)
+        btn_back = findViewById(R.id.btn_back)
+        btn_elvt = findViewById(R.id.btn_elvt)
 
-        var root1 = mutableListOf<Triple<Double, String, String>>()
-        var root2 = mutableListOf<Triple<Double, String, String>>()
+        var scid = db.findCrosstoID(startId, nodesCross)
+        var ecid = db.findCrosstoID(endId, nodesCross)
+
+        var checklist = mutableListOf<Int>()
+
+        var rootsub = mutableListOf<Triple<Double, String, String>>()
+
         var startfloor = 0
-        var endfloor = 0
+        var checkfloor = 0
 
         var check = 0
+        var checkidx = 0
 
         if (startId != null && endId != null)
         {
@@ -615,71 +618,131 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             dijk = Dijkstra(nodesCross, startId!!, endId!!)
             root = dijk.findShortestPath(dijk!!.makeGraph())
 
-            if (root[0].first.toInt() / 100 != root[root.size - 1].first.toInt() / 100) {
-                startfloor = root[0].first.toInt() / 100
-                endfloor = root[root.size - 1].first.toInt() / 100
+            checklist.add(0)
+            checkfloor = root[0].first.toInt() / 100
 
-                for (i in root) {
-                    if (i.first.toInt() / 100 == startfloor) {
-                        root1.add(i)
-                    }
+            for (i in root) {
+                if (checkfloor != i.first.toInt() / 100) {
+                    checklist.add(check)
 
-                    else if (i.first.toInt() / 100 == endfloor) {
-                        root2.add(i)
-                    }
+                    checkfloor = i.first.toInt() / 100
                 }
+
+                check += 1
             }
 
-            if (root1.isEmpty()) {
+            startfloor = root[0].first.toInt() / 100
+
+            if (checklist.size == 1) {
+                map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
+
                 map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
                 map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
 
-                makeLine()
+                makeLine(root)
             }
             else {
-                testinfo.visibility = View.VISIBLE
+                info_elvt.visibility = View.VISIBLE
+
+                rootsub = root.subList(checklist[checkidx], checklist[checkidx + 1]).toMutableList()
 
                 spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
 
-                root = root1
+                scid = db.findCrosstoID(rootsub[0].first, nodesCross)
+                ecid = db.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
+
+                startId = scid!!.id
+                endId = ecid!!.id
 
                 handler.postDelayed({
-                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                    map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
 
-                    makeLine()
+                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                    map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
+                    makeLine(rootsub)
                 }, 1000)
 
-                testbtn.setOnClickListener(){
-                    if (check == 0) {
-                        spinner.setSelection(db.findIdxtoFloor(endfloor, floorsIndoor))
+                btn_elvt.text = "${root[checklist[checkidx + 1]].first.toInt() / 100}층으로 이동"
 
-                        root = root2
+                btn_elvt.setOnClickListener(){
+                    checkidx += 1
 
-                        handler.postDelayed({
-                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-
-                            makeLine()
-                        }, 500)
-
-                        testbtn.text = "뒤로"
-
-                        check = 1
+                    if (checkidx == checklist.size - 1) {
+                        rootsub = root.subList(checklist[checkidx], root.size).toMutableList()
+                    }
+                    else {
+                        rootsub = root.subList(checklist[checkidx], checklist[checkidx + 1]).toMutableList()
                     }
 
-                    else if (check == 1) {
-                        spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
+                    spinner.setSelection(db.findIdxtoFloor(rootsub[0].first.toInt() / 100, floorsIndoor))
 
-                        root = root1
+                    scid = db.findCrosstoID(rootsub[0].first, nodesCross)
+                    ecid = db.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
 
-                        handler.postDelayed({
-                            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                    startId = scid!!.id
+                    endId = ecid!!.id
 
-                            makeLine()
-                        }, 500)
+                    handler.postDelayed({
+                        map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
 
-                        testbtn.text = "탑승"
+                        map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                        map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
 
-                        check = 0
+                        makeLine(rootsub)
+                    }, 1000)
+
+                    if (checkidx != 0) {
+                        btn_back.visibility = View.VISIBLE
+                    }
+                    else {
+                        btn_back.visibility = View.GONE
+                    }
+
+                    if (checkidx == checklist.size - 1) {
+                        btn_elvt.visibility = View.GONE
+                    }
+                    else {
+                        btn_elvt.visibility = View.VISIBLE
+                        btn_elvt.text = "${root[checklist[checkidx + 1]].first.toInt() / 100}층으로 이동"
+                    }
+                }
+
+                btn_back.setOnClickListener(){
+                    checkidx -= 1
+
+                    rootsub = root.subList(checklist[checkidx], checklist[checkidx + 1]).toMutableList()
+
+                    spinner.setSelection(db.findIdxtoFloor(rootsub[0].first.toInt() / 100, floorsIndoor))
+
+                    scid = db.findCrosstoID(rootsub[0].first, nodesCross)
+                    ecid = db.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
+
+                    startId = scid!!.id
+                    endId = ecid!!.id
+
+                    handler.postDelayed({
+                        map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
+
+                        map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                        map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+
+                        makeLine(rootsub)
+                    }, 1000)
+
+                    if (checkidx != 0) {
+                        btn_back.visibility = View.VISIBLE
+                    }
+                    else {
+                        btn_back.visibility = View.GONE
+                    }
+
+                    if (checkidx == checklist.size - 1) {
+                        btn_elvt.visibility = View.GONE
+                    }
+                    else {
+                        btn_elvt.visibility = View.VISIBLE
+                        btn_elvt.text = "${root[checklist[checkidx + 1]].first.toInt() / 100}층으로 이동"
                     }
                 }
             }
@@ -796,14 +859,22 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         infoPic1.setImageBitmap(cross.imgNorth)
                     }
 
-                    infoPic2.setImageResource(choiceArrow(i.second, i.third))
+                    val check = choiceArrow(i.second, i.third)
+
+                    if (cross.id == startId || cross.id == endId) {
+                        infoPic1.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                        infoPic2.setImageResource(0)
+                        infoText1.setText(db.findPlacetoID(cross.id, nodesPlace)!!.name)
+                    }
+                    else {
+                        infoPic2.setImageResource(check.first)
+                        infoText1.setText("${cross?.name}에서 ${check.second}")
+                    }
 
                     break
                 }
             }
 
-            // 지명
-            infoText1.setText(cross?.nodes.toString())
             info.visibility = View.VISIBLE
 
             map.animateScaleAndCenter(1f,PointF(cross.x.toFloat()*ratio, cross.y.toFloat()*ratio))?.start()
@@ -822,57 +893,57 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }
     }
 
-    fun choiceArrow(second: String, third: String): Int {
+    fun choiceArrow(second: String, third: String): Pair<Int, String> {
         if (second == "east") {
             if (third == "south") {
-                return R.drawable.east_arrow
+                return Pair(R.drawable.east_arrow, "우회전")
             }
             else if (third == "north") {
-                return R.drawable.west_arrow
+                return Pair(R.drawable.west_arrow, "좌회전")
             }
             else {
-                return R.drawable.north_arrow
+                return Pair(R.drawable.north_arrow, "직진")
             }
         }
         else if (second == "west") {
             if (third == "north") {
-                return R.drawable.east_arrow
+                return Pair(R.drawable.east_arrow, "우회전")
             }
             else if (third == "south") {
-                return R.drawable.west_arrow
+                return Pair(R.drawable.west_arrow, "좌회전")
             }
             else {
-                return R.drawable.north_arrow
+                return Pair(R.drawable.north_arrow, "직진")
             }
         }
         else if (second == "south") {
             if (third == "west") {
-                return R.drawable.east_arrow
+                return Pair(R.drawable.east_arrow, "우회전")
             }
             else if (third == "east") {
-                return R.drawable.west_arrow
+                return Pair(R.drawable.west_arrow, "좌회전")
             }
             else {
-                return R.drawable.north_arrow
+                return Pair(R.drawable.north_arrow, "직진")
             }
         }
         else if (second == "north") {
             if (third == "east") {
-                return R.drawable.east_arrow
+                return Pair(R.drawable.east_arrow, "우회전")
             }
             else if (third == "west") {
-                return R.drawable.west_arrow
+                return Pair(R.drawable.west_arrow, "좌회전")
             }
             else {
-                return R.drawable.north_arrow
+                return Pair(R.drawable.north_arrow, "직진")
             }
         }
         else {
-            return 0
+            return Pair(0, "")
         }
     }
 
-    fun makeLine() {
+    fun makeLine(root: List<Triple<Double, String, String>>) {
         for (i in root)
         {
             var pointt = db.findCrosstoID(i.first, nodesCross!!)
@@ -882,16 +953,16 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             if ((i.first % 100) > 70) {
                 if (i.third == "east") {
-                    map.addPin(PointF(tempX, tempY), 1, R.drawable.east_arrow)
+                    map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.east_arrow,2.0f, 2.0f)
                 }
                 else if (i.third == "west") {
-                    map.addPin(PointF(tempX, tempY), 1, R.drawable.west_arrow)
+                    map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.west_arrow, 2.0f, 2.0f)
                 }
                 else if (i.third == "south") {
-                    map.addPin(PointF(tempX, tempY), 1, R.drawable.south_arrow)
+                    map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.south_arrow, 2.0f, 2.0f)
                 }
                 else if (i.third == "north") {
-                    map.addPin(PointF(tempX, tempY), 1, R.drawable.north_arrow)
+                    map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.north_arrow, 2.0f, 2.0f)
                 }
             }
         }
