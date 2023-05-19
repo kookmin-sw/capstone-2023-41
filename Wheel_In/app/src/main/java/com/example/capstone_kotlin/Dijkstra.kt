@@ -4,11 +4,11 @@ import com.example.capstone_kotlin.DataBaseHelper
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int, val endID: Int) {
-    data class Node(val index: Int, val distance: Int)
+class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Double, val endID: Double) {
+    data class Node(val index: Double, val distance: Int)
 
-    fun makeGraph(): List<Triple<Int, Int, Int>> {
-        var graph = mutableListOf<Triple<Int, Int, Int>>()
+    fun makeGraph(): List<Triple<Double, Double, Int>> {
+        var graph = mutableListOf<Triple<Double, Double, Int>>()
 
         for (i in nodesCross) {
             for (j in i.nodes) {
@@ -19,7 +19,7 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return graph
     }
 
-    fun findDist(distances: ArrayList<Pair<Int, Int>>, first: Int): Int {
+    fun findDist(distances: ArrayList<Pair<Double, Int>>, first: Double): Int {
         for (i in distances) {
             if (i.first == first) {
                 return i.second
@@ -29,7 +29,7 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return Int.MAX_VALUE
     }
 
-    fun findVisit(visited: ArrayList<Pair<Int, Boolean>>, first: Int): Boolean {
+    fun findVisit(visited: ArrayList<Pair<Double, Boolean>>, first: Double): Boolean {
         for (i in visited) {
             if (i.first == first) {
                 return i.second
@@ -39,17 +39,17 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return false
     }
 
-    fun findPrev(previous: ArrayList<Pair<Int, Int>>, first: Int): Int {
+    fun findPrev(previous: ArrayList<Pair<Double, Double>>, first: Double): Double {
         for (i in previous) {
             if (i.first == first) {
                 return i.second
             }
         }
 
-        return -1
+        return -1.0
     }
 
-    fun findDirect(firstID: Int, secondId: Int): String {
+    fun findDirect(firstID: Double, secondId: Double): String {
         for (i in nodesCross) {
             for (j in i.nodes) {
                 if (i.id == firstID && j.first == secondId) {
@@ -61,10 +61,10 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return ""
     }
 
-    fun findShortestPath(graph: List<Triple<Int, Int, Int>>): List<Triple<Int, String, String>> {
-        val distances = ArrayList<Pair<Int, Int>>()
-        val visited = ArrayList<Pair<Int, Boolean>>()
-        val previous = ArrayList<Pair<Int, Int>>()
+    fun findShortestPath(graph: List<Triple<Double, Double, Int>>): List<Triple<Double, String, String>> {
+        val distances = ArrayList<Pair<Double, Int>>()
+        val visited = ArrayList<Pair<Double, Boolean>>()
+        val previous = ArrayList<Pair<Double, Double>>()
 
         for (i in nodesCross) {
             if (i.id == startID) {
@@ -75,7 +75,7 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
             }
 
             visited.add(Pair(i.id, false))
-            previous.add(Pair(i.id, -1))
+            previous.add(Pair(i.id, -1.0))
         }
 
         val queue = PriorityQueue<Node>(compareBy { it.distance })
@@ -115,11 +115,11 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return buildPath(previous)
     }
 
-    fun buildPath(previous: ArrayList<Pair<Int, Int>>): List<Triple<Int, String, String>> {
-        val path = mutableListOf<Int>()
+    fun buildPath(previous: ArrayList<Pair<Double, Double>>): List<Triple<Double, String, String>> {
+        val path = mutableListOf<Double>()
         var currentIndex = endID
 
-        while (currentIndex != -1) {
+        while (currentIndex != -1.0) {
             path.add(currentIndex)
             currentIndex = findPrev(previous, currentIndex)
         }
@@ -129,8 +129,8 @@ class Dijkstra(val nodesCross: List<DataBaseHelper.CrossNode>, val startID: Int,
         return bulidDirect(path)
     }
 
-    fun bulidDirect(path: List<Int>): List<Triple<Int, String, String>> {
-        val result = ArrayList<Triple<Int, String, String>>()
+    fun bulidDirect(path: List<Double>): List<Triple<Double, String, String>> {
+        val result = ArrayList<Triple<Double, String, String>>()
 
         result.add(Triple(path[0], "start", "start"))
 
