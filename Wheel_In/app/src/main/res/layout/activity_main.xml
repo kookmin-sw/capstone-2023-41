@@ -121,8 +121,7 @@
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="8.5"
-            app:src="@drawable/map" />
+            android:layout_weight="8.5"/>
         <!--        지도 레이아웃 끝-->
 
         <!--        연락, 스피너 레이아웃-->
@@ -157,6 +156,54 @@
     </LinearLayout>
     <!--    화면 전체 레이아웃 끝-->
 
+    <!--    자동 완성 레이아웃 -->
+    <FrameLayout
+        android:id="@+id/autoCom"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="10dp"
+        android:background="@color/white"
+        android:visibility="gone"
+        >
+
+        <ListView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/listView1"
+            android:layout_width="280dp"
+            android:layout_height="120dp"
+            android:divider="#ad5"
+            android:dividerHeight="2dp"
+            />
+
+    </FrameLayout>
+
+    <!--    자동 완성 레이아웃 -->
+    <FrameLayout
+        android:id="@+id/autoCom2"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="160dp"
+        android:layout_marginLeft="10dp"
+        android:background="@color/white"
+        android:visibility="gone"
+        >
+
+        <ListView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/listView2"
+            android:layout_width="280dp"
+            android:layout_height="120dp"
+            android:divider="#ad5"
+            android:dividerHeight="2dp"
+            />
+
+    </FrameLayout>
+
     <FrameLayout
         android:id="@+id/testinfo"
         android:layout_width="match_parent"
@@ -174,6 +221,27 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="620dp"
+                android:id="@+id/plus"
+                android:text="+"/>
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="620dp"
+                android:id="@+id/minus"
+                android:text="-"/>
+
+    </FrameLayout>
 
 
     <!--    정보창 전체 레이아웃-->
@@ -183,7 +251,8 @@
         app:layout_constraintHeight_percent="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/info"
-        android:visibility="gone">
+        android:visibility="gone"
+        >
 
         <!--        정보창에 담길 레이아웃-->
         <LinearLayout
@@ -195,12 +264,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="장소명"
+                    android:layout_gravity="center"
                     android:id="@+id/text1"
                     android:textSize="30sp">
                 </TextView>
@@ -210,7 +280,7 @@
                     android:layout_height="wrap_content"
                     android:text="접근성"
                     android:id="@+id/text2"
-                    android:layout_marginLeft="40dp"
+                    android:layout_gravity="right"
                     android:textSize="30sp">
                 </TextView>
 
@@ -224,14 +294,14 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="200dp"
                     android:layout_weight="1"
                     android:id="@+id/infoPic1">
                 </ImageView>
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="200dp"
                     android:layout_weight="1"
                     android:id="@+id/infoPic2">
                 </ImageView>
