@@ -513,14 +513,19 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             placeid = parts[0].toInt()
             floorid = parts[1].toInt() / 100
 
-            spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+            val handler = Handler()
+            handler.postDelayed({
+                interaction = false
+                spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+            }, 1000)
 
             id = db.findPlacetoID(parts[1].toInt(), nodesPlace)
 
             val handler = Handler()
             handler.postDelayed({
                 showInfo(id)
-            }, 1000)
+                interaction = true
+            }, 2000)
         }
     }
 
