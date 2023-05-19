@@ -555,12 +555,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         var layoutParams = searchView_layout.layoutParams as LinearLayout.LayoutParams
         if(v == View.VISIBLE){
             svAndCancel.visibility = View.VISIBLE
-            layoutParams.weight = 3f
+            layoutParams.weight = 2.8f
             searchView_layout.layoutParams = layoutParams
         }
         else{
             svAndCancel.visibility = View.GONE
-            layoutParams.weight = 1.3f
+            layoutParams.weight = 1.2f
             searchView_layout.layoutParams = layoutParams
         }
     }
