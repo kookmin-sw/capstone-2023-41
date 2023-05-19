@@ -17,7 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.2"
+            android:layout_weight="1.3"
             android:layout_margin="5dp"
             android:id="@+id/searchView_layout"
             android:orientation="vertical">
@@ -121,8 +121,7 @@
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7.8"
-            app:src="@drawable/map" />
+            android:layout_weight="8.5"/>
         <!--        지도 레이아웃 끝-->
 
         <!--        연락, 스피너 레이아웃-->
@@ -235,7 +234,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
                 android:id="@+id/plus"
@@ -243,7 +242,7 @@
                 android:textSize="20sp"/>
 
             <Button
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/minus"
                 android:textSize="20sp"
