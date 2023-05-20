@@ -222,6 +222,16 @@ class DataBaseHelper(private val context: Context) :
         return null
     }
 
+    fun searchPlace2(text: String, list: List<PlaceNode>): PlaceNode? {
+        for (i in list) {
+            if (i.name == text) {
+                return i
+            }
+        }
+
+        return null
+    }
+
     fun findCrosstoXY(x: Int, y: Int, list: List<CrossNode>, floorid: Int): CrossNode? {
         for (i in list) {
             if (i.id.toInt() / 100 == floorid) {

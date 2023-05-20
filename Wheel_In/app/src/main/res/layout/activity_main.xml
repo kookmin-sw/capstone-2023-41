@@ -204,23 +204,9 @@
 
     </FrameLayout>
 
-    <FrameLayout
-        android:id="@+id/testinfo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
 
-        <Button
-            android:id="@+id/testbtn"
-            android:layout_width="77dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            android:text="탑승">
 
-        </Button>
-
-    </FrameLayout>
-
+<!--    지도 확대 축소 버튼-->
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="115dp"
@@ -248,10 +234,21 @@
                 android:textSize="20sp"
                 android:text="-"/>
 
+            <Button
+                android:id="@+id/testbtn"
+                android:layout_marginHorizontal="13dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:text="엘리베이터를 탑승하시면 눌러주세요."
+                android:visibility="gone"
+                >
+            </Button>
+
         </LinearLayout>
 
     </FrameLayout>
-
+<!--    지도 확대 축소 버튼 끝-->
 
     <!--    정보창 전체 레이아웃-->
     <FrameLayout

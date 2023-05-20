@@ -60,7 +60,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     fun addPin(
         point: PointF,
         fix: Int = 0,
-        imageID: Int = R.drawable.pushpin_blue,
+        imageID: Int,
         id: String = "0",
         width: Float = 2.0f,
         height: Float = 1.0f,
@@ -75,7 +75,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         id: String = "0",
         nPin: PointF,
         fix: Int = 0,
-        imageID: Int = R.drawable.pushpin_blue,
+        imageID: Int,
         width: Float = 2.0f,
         height: Float = 1.0f,
         text: String = ""
@@ -89,7 +89,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         id: String = "0",
         nPin: PointF,
         fix: Int = 0,
-        imageID: Int = R.drawable.pushpin_blue,
+        imageID: Int = R.drawable.bluepin,
         width: Int = 2,
         height: Int = 1,
         text: String = ""
