@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.davemorrissey.labs.subscaleview.ImageSource
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
 
 
@@ -50,7 +51,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     private lateinit var spinner: Spinner
 
-    private lateinit var testinfo: FrameLayout
     private lateinit var testbtn: Button
 
     // QR 촬영으로 값 받아올 변수
@@ -96,6 +96,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // 지도 크기
     var mScale = 0f
+
+    // 바텀시트
+    private lateinit var bottomSheetView : View
+    private lateinit var bottomSheetDialog : BottomSheetDialog
+    private lateinit var bottomSheetForwardBtn : Button
+    private lateinit var bottomSheetBackwardBtn : Button
 
     override fun onCreate(savedInstanceState: Bundle?) { // onCreate 함수를 오버라이드. 이 함수는 액티비티가 생성될 때 호출됨.
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
@@ -159,6 +165,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         // 화면 비율
         ratio = map.getResources().getDisplayMetrics().density.toFloat() // 화면에 따른 이미지의 해상도 비율
 
+        // bottomSheet 선언
+        bottomSheetView = layoutInflater.inflate(R.layout.activity_bottomsheet, null)
+        bottomSheetDialog = BottomSheetDialog(this)
+        bottomSheetDialog.behavior.peekHeight = 600 // 펼치기 전 사이즈
+        bottomSheetDialog.setContentView(bottomSheetView)
 
 
         // 자동 완성
@@ -195,6 +206,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 }
                 else if(newText.isNotEmpty()){
                     autoCom.visibility = View.VISIBLE
+                    if(newText == db.searchPlace2(newText, nodesPlace)?.name){
+                        autoCom.visibility = View.GONE
+                    }
                 }
 
                 return true
@@ -246,6 +260,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     autoCom2.visibility = View.VISIBLE
                     if(newText.isNotEmpty()){
                         autoCom2.visibility = View.VISIBLE
+                        if(newText == db.searchPlace2(newText, nodesPlace)?.name){
+                            autoCom2.visibility = View.GONE
+                        }
                     }
                     else if(newText.isEmpty()){
                         autoCom2.visibility = View.GONE
@@ -304,6 +321,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 취소 버튼 활성화.
         cancel.setOnClickListener{
+            spinner.isEnabled = true // 스피너 활성화 설정
             searchView2.setQuery("", false)
             searchView1.setQuery("", false)
             setSearchLayout(View.GONE)
@@ -316,8 +334,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             interaction = true
 
-            testinfo.visibility = View.GONE
-            testbtn.text = "탑승"
+            testbtn.visibility = View.GONE
+            testbtn.text = "엘리베이터를 탑승하시면 눌러주세요."
         }
 
 
@@ -337,7 +355,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             {
                 if(i.checkplace == 1 && i.id.toInt() / 100 == floorid)
                 {
-                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.bluepin)
                 }
             }
         }
@@ -348,7 +366,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             {
                 if(i.checkplace == 2 && i.id.toInt() / 100 == floorid)
                 {
-                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.bluepin)
                 }
             }
         }
@@ -359,7 +377,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             {
                 if(i.checkplace == 3 && i.id.toInt() / 100 == floorid)
                 {
-                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.bluepin)
                 }
             }
         }
@@ -391,7 +409,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             startId = id?.id
             map.clearStartPin()
             map.clearPin()
-            map.addStartPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.pushpin_blue)
+            map.addStartPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.bluepin)
             mapInit()
             info.visibility = View.GONE
         }
@@ -408,7 +426,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             searchView2.setQuery(id?.name, false)
             map.clearPin()
             map.clearEndPin()
-            map.addEndPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.pushpin_blue)
+            map.addEndPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.greenpin)
             endId = id?.id
             mapInit()
             info.visibility = View.GONE
@@ -467,7 +485,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 var drawableName: String?
                 var drawableId: Int?
                 val selectedItem: String = parent.getItemAtPosition(position) as String
-                val sss = parent.getItemAtPosition(position) as String
                 if (selectedItem == "Add New Item") {
                     // Do something
                 }
@@ -484,13 +501,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 map.clearEndPin()
                 map.clearPin("icon")
                 addIcon(nodesPlace, floorid)
-
-//                if(interaction){
-//                    val handler = Handler()
-//                    handler.postDelayed({
-//                        map.animateScaleAndCenter(0.5f,PointF(map.width*ratio, map.height*ratio))?.start()
-//                    }, 500)
-//                }
             }
 
 
@@ -528,11 +538,11 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
                     cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
-                    if (cross != null) {
-                        showCross(cross, root)
-                    }
-                    else if (cross == null) {
-                        showCross(null, root)
+                    for(i in root){
+                        if(i.first == cross?.id){
+                            showCross(cross, root)
+                            return true
+                        }
                     }
                     return true
                 }
@@ -580,11 +590,18 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         }, 2000)
     }
 
+    fun addIcon(nodesPlace: List<DataBaseHelper.PlaceNode>, floorId: Int) {
+        for (i in nodesPlace) {
+            if (i.id.toInt() / 100 == floorId) {
+                map.addPin("icon", PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 0, R.drawable.icon, 2.0f, 2.0f, i.nickname)
+            }
+        }
+    }
+
 
     // 길 찾기
     fun mapInit()
     {
-        testinfo = findViewById(R.id.testinfo)
         testbtn = findViewById(R.id.testbtn)
 
         var scid = db.findCrosstoID(startId, nodesCross)
@@ -600,6 +617,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         if (startId != null && endId != null)
         {
             interaction = false
+            spinner.isEnabled = false // 스피너 비활성화 설정
+
             map.clearStartPin()
             map.clearEndPin()
 
@@ -622,20 +641,20 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             }
 
             if (root1.isEmpty()) {
-                map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
-                map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
+                map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.greenpin)
 
                 makeLine()
             }
             else {
-                testinfo.visibility = View.VISIBLE
+                testbtn.visibility = View.VISIBLE
 
                 spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
 
                 root = root1
 
                 handler.postDelayed({
-                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
 
                     makeLine()
                 }, 1000)
@@ -647,12 +666,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         root = root2
 
                         handler.postDelayed({
-                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.greenpin)
 
                             makeLine()
                         }, 500)
 
-                        testbtn.text = "뒤로"
+                        testbtn.text = "이전 화면"
 
                         check = 1
                     }
@@ -663,12 +682,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         root = root1
 
                         handler.postDelayed({
-                            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+                            map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
 
                             makeLine()
                         }, 500)
 
-                        testbtn.text = "탑승"
+                        testbtn.text = "엘리베이터를 탑승하시면 눌러주세요."
 
                         check = 0
                     }
@@ -759,7 +778,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             info.visibility = View.VISIBLE
 
             map.animateScaleAndCenter(1f,PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio))?.start()
-            map.addPin(PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio), 1, R.drawable.pushpin_blue)
+            map.addPin(PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio), 1, R.drawable.bluepin)
 
             return
         }
@@ -770,47 +789,95 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     }
 
     fun showCross(cross: DataBaseHelper.CrossNode?, root: List<Triple<Double, String, String>>) {
+
+        var bsText : TextView = bottomSheetView.findViewById(R.id.bsText)
+        var bsImage : ImageView = bottomSheetView.findViewById(R.id.bsImage)
+        var bsArrow : ImageView = bottomSheetView.findViewById(R.id.bsArrowImage)
+        var crossIndex = -1
+        bottomSheetForwardBtn = bottomSheetView.findViewById(R.id.bs_btn_forward)
+        bottomSheetBackwardBtn = bottomSheetView.findViewById(R.id.bs_btn_backward)
+
+        bottomSheetForwardBtn.setOnClickListener(){
+            var next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
+            while ((next_cross!!.id % 100 <= 70) && (crossIndex < root.size))
+            {
+                crossIndex = crossIndex + 1
+                next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
+            }
+            if (next_cross != null) {
+                showCross(next_cross, root)
+            }
+            else if (next_cross == null) {
+                showCross(null, root)
+            }
+        }
+        bottomSheetBackwardBtn.setOnClickListener() {
+            var prev_cross = db.findCrosstoID(root[crossIndex-1].first, nodesCross)
+            while ((prev_cross!!.id % 100 <= 70) && (crossIndex > -1))
+            {
+                crossIndex = crossIndex - 1
+                prev_cross = db.findCrosstoID(root[crossIndex-1].first, nodesCross)
+            }
+            if (prev_cross != null) {
+                showCross(prev_cross, root)
+            }
+            else if (prev_cross == null) {
+                showCross(null, root)
+            }
+        }
+
         if (cross != null) {
-            for (i in root) {
+            for (index in root.indices) {
+                var i = root[index]
                 if (cross.id == i.first) {
+                    crossIndex = index
                     // 정보 사진
                     if (i.second == "east") {
-                        infoPic1.setImageBitmap(cross.imgEast)
-                    }
-                    else if (i.second == "west") {
-                        infoPic1.setImageBitmap(cross.imgWest)
-                    }
-                    else if (i.second == "south") {
-                        infoPic1.setImageBitmap(cross.imgSouth)
-                    }
-                    else if (i.second == "north") {
-                        infoPic1.setImageBitmap(cross.imgNorth)
+                        bsImage.setImageBitmap(cross.imgEast)
+                    } else if (i.second == "west") {
+                        bsImage.setImageBitmap(cross.imgWest)
+                    } else if (i.second == "south") {
+                        bsImage.setImageBitmap(cross.imgSouth)
+                    } else if (i.second == "north") {
+                        bsImage.setImageBitmap(cross.imgNorth)
                     }
 
-                    infoPic2.setImageResource(choiceArrow(i.second, i.third))
+                    bsArrow.setImageResource(choiceArrow(i.second, i.third))
 
                     break
                 }
             }
-
-            // 지명
-            infoText1.setText(cross?.nodes.toString())
-            info.visibility = View.VISIBLE
-
-            map.animateScaleAndCenter(1f,PointF(cross.x.toFloat()*ratio, cross.y.toFloat()*ratio))?.start()
-            return
         }
-        else{
-            info.visibility = View.GONE
-        }
-    }
+        else {return}
+        // 지명
+        bsText.setText(cross?.nodes.toString())
+//        bsText.setText("자세한 정보를 보려면 위로 올려주세요.")
 
-    fun addIcon(nodesPlace: List<DataBaseHelper.PlaceNode>, floorId: Int) {
-        for (i in nodesPlace) {
-            if (i.id.toInt() / 100 == floorId) {
-                map.addPin("icon", PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 0, R.drawable.icon, 2.0f, 2.0f, i.nickname)
-            }
+        map.animateScaleAndCenter(1f,PointF(cross!!.x.toFloat()*ratio, cross.y.toFloat()*ratio))?.start()
+
+        var first_cross : Int = 10000000
+        var last_cross : Int = -1
+        root.forEachIndexed { index, triple ->
+            if ((triple.first % 100 > 70) && (index < first_cross))
+            { first_cross = index }
+            if ((triple.first % 100 > 70))
+            { last_cross = index }
         }
+        if (crossIndex >= last_cross)
+        {bottomSheetForwardBtn.visibility = View.GONE}
+        else if (bottomSheetForwardBtn.visibility == View.GONE) {
+            bottomSheetForwardBtn.visibility = View.VISIBLE
+        }
+        if (crossIndex <= first_cross)
+        {bottomSheetBackwardBtn.visibility = View.GONE}
+        else if (bottomSheetBackwardBtn.visibility == View.GONE){
+            bottomSheetBackwardBtn.visibility = View.VISIBLE
+        }
+
+        bottomSheetDialog.show()
+
+        return
+
     }
 
     fun choiceArrow(second: String, third: String): Int {
