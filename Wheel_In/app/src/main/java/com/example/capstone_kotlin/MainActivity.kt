@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var spinner: Spinner
 
     private lateinit var info_elvt: LinearLayout
+    private lateinit var detail: TextView
 
     private lateinit var btn_back: Button
     private lateinit var btn_elvt: Button
@@ -329,8 +330,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             searchView1.setQuery("", false)
             setSearchLayout(View.GONE)
             map.clearPin()
-//            map.clearStartPin()
-//            map.clearEndPin()
+
             map.cleanOtherPin("icon")
 
             startId = null
@@ -338,9 +338,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             interaction = true
 
-//            testbtn.visibility = View.GONE
-//            testbtn.text = "엘리베이터를 탑승하시면 눌러주세요."
             info_elvt.visibility = View.GONE
+            detail.visibility = View.GONE
+
 
             btn_elvt.visibility = View.VISIBLE
             btn_back.visibility = View.GONE
@@ -622,6 +622,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     fun mapInit()
     {
         info_elvt = findViewById(R.id.info_elvt)
+        detail = findViewById(R.id.detail)
 
         btn_back = findViewById(R.id.btn_back)
         btn_elvt = findViewById(R.id.btn_elvt)
@@ -642,6 +643,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         if (startId != null && endId != null)
         {
+            detail.visibility = View.VISIBLE
             interaction = false
             spinner.isEnabled = false // 스피너 비활성화 설정
 
@@ -922,16 +924,16 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var check = choiceArrow(i.second, i.third)
                     if (i.second == "east") {
                         bsImage.setImageBitmap(cross.imgEast)
-                        bsText.setText(check.second + "하세요.")
+                        bsText.setText(cross.name + "에서 " + check.second)
                     } else if (i.second == "west") {
                         bsImage.setImageBitmap(cross.imgWest)
-                        bsText.setText(check.second + "하세요.")
+                        bsText.setText(cross.name + "에서 " + check.second)
                     } else if (i.second == "south") {
                         bsImage.setImageBitmap(cross.imgSouth)
-                        bsText.setText(check.second + "하세요.")
+                        bsText.setText(cross.name + "에서 " + check.second)
                     } else if (i.second == "north") {
                         bsImage.setImageBitmap(cross.imgNorth)
-                        bsText.setText(check.second + "하세요.")
+                        bsText.setText(cross.name + "에서 " + check.second)
                     }
 
 
@@ -943,9 +945,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             }
         }
         else {return}
-        // 지명
-//        bsText.setText(cross.nodes.toString())
-//        bsText.setText("자세한 정보를 보려면 위로 올려주세요.")
 
         map.animateScaleAndCenter(1f,PointF(cross.x.toFloat()*ratio, cross.y.toFloat()*ratio))?.start()
 
@@ -1023,55 +1022,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             return Pair(0, "")
         }
     }
-//fun choiceArrow(second: String, third: String): Int {
-//    if (second == "east") {
-//        if (third == "south") {
-//            return R.drawable.east_arrow
-//        }
-//        else if (third == "north") {
-//            return R.drawable.west_arrow
-//        }
-//        else {
-//            return R.drawable.north_arrow
-//        }
-//    }
-//    else if (second == "west") {
-//        if (third == "north") {
-//            return R.drawable.east_arrow
-//        }
-//        else if (third == "south") {
-//            return R.drawable.west_arrow
-//        }
-//        else {
-//            return R.drawable.north_arrow
-//        }
-//    }
-//    else if (second == "south") {
-//        if (third == "west") {
-//            return R.drawable.east_arrow
-//        }
-//        else if (third == "east") {
-//            return R.drawable.west_arrow
-//        }
-//        else {
-//            return R.drawable.north_arrow
-//        }
-//    }
-//    else if (second == "north") {
-//        if (third == "east") {
-//            return R.drawable.east_arrow
-//        }
-//        else if (third == "west") {
-//            return R.drawable.west_arrow
-//        }
-//        else {
-//            return R.drawable.north_arrow
-//        }
-//    }
-//    else {
-//        return 0
-//    }
-//}
 
     fun makeLine(root: List<Triple<Double, String, String>>) {
         for (i in root)
