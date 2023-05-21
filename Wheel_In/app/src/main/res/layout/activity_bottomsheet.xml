@@ -12,60 +12,56 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        >
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <LinearLayout
-            android:layout_width = "match_parent"
-            android:layout_height = "wrap_content"
-            android:gravity="top"
-            android:orientation="horizontal"
-            >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top">
+
             <TextView
                 android:id="@+id/bsText"
                 android:layout_width="200dp"
                 android:layout_height="70dp"
-                android:layout_margin="5dp"
+                android:layout_weight="1"
                 android:text="bottomSheet Dialog"
-                android:layout_weight = "1"
                 android:textSize="17sp"
-
                 />
+
             <Button
                 android:id="@+id/bs_btn_backward"
                 android:layout_width="wrap_content"
                 android:layout_height="70dp"
-                android:text="이전 교차로"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
+                android:text="이전 교차로"
+                android:layout_marginHorizontal="2dp"
                 android:textSize="12sp" />
+
             <Button
                 android:id="@+id/bs_btn_forward"
                 android:layout_width="wrap_content"
                 android:layout_height="70dp"
-                android:text="다음 교차로"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
+                android:layout_marginHorizontal="2dp"
+                android:text="다음 교차로"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/bsImage"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_gravity = "center"
-                />
+                android:layout_gravity="center" />
+
             <ImageView
                 android:id="@+id/bsArrowImage"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:layout_gravity = "right"
-                />
+                android:layout_gravity="right" />
         </FrameLayout>
     </LinearLayout>
 
