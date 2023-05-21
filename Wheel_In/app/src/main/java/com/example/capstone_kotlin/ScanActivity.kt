@@ -14,7 +14,7 @@ class ScanActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scan)
+//        setContentView(R.layout.activity_scan)
         scanCode()
     }
 

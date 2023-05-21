@@ -7,15 +7,19 @@
     android:scrollbarSize="10dp"
     tools:context=".MainActivity">
 
+    <!--    화면 전체 레이아웃-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!--        출발지, 목적지 서치뷰 레이아웃-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.3"
+            android:layout_margin="5dp"
+            android:id="@+id/searchView_layout"
             android:orientation="vertical">
 
             <LinearLayout
@@ -25,36 +29,57 @@
 
                 <SearchView
                     android:id="@+id/searchView1"
-                    android:layout_width="260dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="280dp"
+                    android:layout_height="70dp"
                     android:queryHint="목적지를 입력하세요."
                     android:iconifiedByDefault="false"
-                    android:background="@color/light_gray"
+                    android:background="@drawable/searchview_radious"
                     android:layout_margin="5dp"
                     />
 
                 <Button
                     android:id="@+id/qrButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="70dp"
+                    android:background="@drawable/button_radious"
                     android:layout_margin="5dp"
-                    android:text="QR로 위치확인" />
+                    android:textSize="30sp"
+                    android:text="QR" />
+
 
             </LinearLayout>
 
-            <SearchView
-                android:id="@+id/searchView2"
-                android:layout_width="260dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:queryHint="목적지를 입력하세요."
-                android:iconifiedByDefault="false"
-                android:background="@color/light_gray"
-                android:layout_margin="5dp"
+                android:id="@+id/svAndCancel"
                 android:visibility="gone"
-                />
+                android:orientation="horizontal">
+
+                <SearchView
+                    android:id="@+id/searchView2"
+                    android:layout_width="280dp"
+                    android:layout_height="70dp"
+                    android:queryHint="목적지를 입력하세요."
+                    android:iconifiedByDefault="false"
+                    android:background="@drawable/searchview_radious"
+                    android:layout_margin="5dp"
+                    />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="80dp"
+                    android:text="취소"
+                    android:background="@drawable/button_radious"
+                    android:id="@+id/cancel"
+                    android:textSize="30sp"/>
+            </LinearLayout>
+
+
 
         </LinearLayout>
+        <!--        출발지 목적지 레이아웃 끝-->
 
+        <!--        원클릭 버튼 레이아웃-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -63,39 +88,43 @@
 
             <Button
                 android:id="@+id/btn_toilet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="118dp"
+                android:layout_height="65dp"
                 android:text="화장실"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:textSize="12sp" />
+                android:textSize="17sp" />
 
             <Button
                 android:id="@+id/btn_enter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="118dp"
+                android:layout_height="65dp"
                 android:text="출입문"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:textSize="12sp" />
+                android:textSize="17sp" />
 
             <Button
                 android:id="@+id/btn_elevator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="118dp"
+                android:layout_height="65dp"
                 android:text="엘레베이터"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:textSize="12sp" />
+                android:layout_margin="5dp"
+                android:textSize="17sp" />
 
         </LinearLayout>
+        <!--        원클릭 버튼 레이아웃 끝 -->
 
+        <!--        지도 레이아웃-->
         <com.example.capstone_kotlin.PinView
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="9"/>
+            android:layout_weight="8.5"/>
+        <!--        지도 레이아웃 끝-->
 
+        <!--        연락, 스피너 레이아웃-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -105,104 +134,166 @@
 
             <Button
                 android:id="@+id/btn_emergency"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginHorizontal="20dp"
-                android:text="비상 연락 요청" />
+                android:background="@drawable/button_radious"
+                android:textSize="18sp"
+                android:text="비상 연락" />
 
             <Spinner
                 android:id="@+id/spinner"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:background="@color/beige"
+                android:layout_height="match_parent"
+                android:background="@drawable/spinner_background"
                 android:contentDescription="스피너 항목 선택"
-                android:layout_marginHorizontal="30dp"
+                android:layout_marginStart="85dp"
                 android:prompt="@string/spinner_prompt" />
 
         </LinearLayout>
+        <!--        연락, 스피너 레이아웃 끝-->
 
     </LinearLayout>
+    <!--    화면 전체 레이아웃 끝-->
 
+    <!--    자동 완성 레이아웃 -->
+    <FrameLayout
+        android:id="@+id/autoCom"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="10dp"
+        android:background="@color/white"
+        android:visibility="gone"
+        >
+
+        <ListView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/listView1"
+            android:layout_width="280dp"
+            android:layout_height="120dp"
+            android:divider="#ad5"
+            android:dividerHeight="2dp"
+            />
+
+    </FrameLayout>
+
+    <!--    자동 완성 레이아웃 -->
+    <FrameLayout
+        android:id="@+id/autoCom2"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="160dp"
+        android:layout_marginLeft="10dp"
+        android:background="@color/white"
+        android:visibility="gone"
+        >
+
+        <ListView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/listView2"
+            android:layout_width="280dp"
+            android:layout_height="120dp"
+            android:divider="#ad5"
+            android:dividerHeight="2dp"
+            />
+
+    </FrameLayout>
+
+
+
+<!--    지도 확대 축소 버튼-->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.3"
+        android:layout_height="130dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:id="@+id/navi"
-        android:visibility="gone">
+        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="horizontal"
+        >
+
+        <LinearLayout
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:id="@+id/plus"
+                android:text="+"
+                android:textSize="20sp"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/minus"
+                android:textSize="20sp"
+                android:text="-"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/info_elvt"
+            android:gravity="right"
+            android:visibility="gone">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginHorizontal="5dp"
+                android:id="@+id/btn_back"
+                android:text="뒤로"
+                android:textSize="20sp"
+                android:visibility="gone"/>
 
-                <Button
-                    android:id="@+id/navi_start"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="길안내 시작" />
-
-                <Button
-                    android:id="@+id/navi_end"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="취소" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/navi_img1"
-                    android:layout_weight="1">
-                </ImageView>
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/navi_img2"
-                    android:layout_weight="1">
-                </ImageView>
-
-            </LinearLayout>
+            <Button
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_elvt"
+                android:textSize="20sp"
+                android:text="층으로 이동"/>
 
         </LinearLayout>
 
     </FrameLayout>
 
+    <!--    지도 확대 축소 버튼 끝-->
+
+    <!--    정보창 전체 레이아웃-->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/info"
-        android:visibility="gone">
+        android:visibility="gone"
+        >
 
+        <!--        정보창에 담길 레이아웃-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <!--            장소명, 접근성 레이아웃-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="장소명"
+                    android:layout_gravity="center"
                     android:id="@+id/text1"
                     android:textSize="30sp">
                 </TextView>
@@ -212,33 +303,36 @@
                     android:layout_height="wrap_content"
                     android:text="접근성"
                     android:id="@+id/text2"
-                    android:layout_marginLeft="40dp"
+                    android:layout_gravity="right"
                     android:textSize="30sp">
                 </TextView>
 
             </LinearLayout>
+            <!--            장소명, 접근성 레이아웃 끝-->
 
+            <!--            장소 이미지 레이아웃-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="200dp"
                     android:layout_weight="1"
                     android:id="@+id/infoPic1">
                 </ImageView>
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="200dp"
                     android:layout_weight="1"
                     android:id="@+id/infoPic2">
                 </ImageView>
 
             </LinearLayout>
+            <!--            장소 이미지 레이아웃 끝-->
 
-
+            <!--            출발 도착 버튼 레이아웃-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -259,10 +353,13 @@
                     android:layout_margin="5dp"
                     android:text="도착" />
             </LinearLayout>
+            <!--            출발 도착 레이아웃 끝-->
 
         </LinearLayout>
+        <!--        정보창에 담길 레이아웃 끝-->
 
     </FrameLayout>
+    <!--    정보창 전체 레이아웃 끝-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
