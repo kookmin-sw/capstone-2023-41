@@ -60,7 +60,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
     fun addPin(
         point: PointF,
         fix: Int = 0,
-        imageID: Int = R.drawable.pushpin_blue,
+        imageID: Int,
         id: String = "0",
         width: Float = 2.0f,
         height: Float = 1.0f,
@@ -75,7 +75,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         id: String = "0",
         nPin: PointF,
         fix: Int = 0,
-        imageID: Int = R.drawable.pushpin_blue,
+        imageID: Int,
         width: Float = 2.0f,
         height: Float = 1.0f,
         text: String = ""
@@ -89,7 +89,7 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         id: String = "0",
         nPin: PointF,
         fix: Int = 0,
-        imageID: Int = R.drawable.pushpin_blue,
+        imageID: Int = R.drawable.bluepin,
         width: Int = 2,
         height: Int = 1,
         text: String = ""
@@ -183,13 +183,17 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         var s = scale
         val density = resources.displayMetrics.densityDpi.toFloat()
         myPaint.textAlign = Paint.Align.CENTER
+        val options = BitmapFactory.Options() // Bitmap 옵션 객체 생성
+//        options.inScaled = false // 이미지 스케일링 비활성화
+
         for(i in pinArray)
         {
             var pin = i.point
             var fix = i.fixed
             var imageId = i.imageId
+
             sourceToViewCoord(pin, vPin)
-            var image = BitmapFactory.decodeResource(this.resources, imageId)
+            var image = BitmapFactory.decodeResource(this.resources, imageId, options)
             w = density / 420f * image!!.getWidth()
             h = density / 420f * image!!.getHeight()
 
