@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <!-- -->
+    <!-- layout_height를 변경하면 bottom_sheet가 최대로 확대되는 크기를 설정합니다. -->
+    <LinearLayout
+        android:id="@+id/bottomSheetDashBoardLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        >
+
+        <LinearLayout
+            android:layout_width = "match_parent"
+            android:layout_height = "wrap_content"
+            android:gravity="top"
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:id="@+id/bsText"
+                android:layout_width="200dp"
+                android:layout_height="70dp"
+                android:layout_margin="5dp"
+                android:text="bottomSheet Dialog"
+                android:layout_weight = "1"
+                android:textSize="17sp"
+
+                />
+            <Button
+                android:id="@+id/bs_btn_backward"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:text="이전 교차로"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+            <Button
+                android:id="@+id/bs_btn_forward"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:text="다음 교차로"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ImageView
+                android:id="@+id/bsImage"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity = "center"
+                />
+            <ImageView
+                android:id="@+id/bsArrowImage"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity = "right"
+                />
+        </FrameLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
