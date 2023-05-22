@@ -212,8 +212,25 @@
         android:layout_height="130dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:orientation="horizontal"
+
         >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:id="@+id/detail"
+                android:text="자세한 정보를 보려면 화살표를 터치하세요."/>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="120dp"
@@ -243,7 +260,8 @@
             android:orientation="horizontal"
             android:id="@+id/info_elvt"
             android:gravity="right"
-            android:visibility="gone">
+            android:visibility="gone"
+            >
 
             <Button
                 android:layout_width="80dp"
@@ -263,6 +281,8 @@
 
         </LinearLayout>
 
+        </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
 
     <!--    지도 확대 축소 버튼 끝-->

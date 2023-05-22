@@ -62,10 +62,12 @@ class DataBaseHelper(private val context: Context) :
                          val x: Int, val y: Int, val access: Int, val img1: Bitmap?, val img2: Bitmap?)
     data class CrossNode(val placeid: Int, val id: Double, val x: Int, val y: Int, val name: String?, val nodes: List<Triple<Double, Int, String>>,
                          val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
+    data class DangerNode(val placeid: Int, val floorid: Int, val checkdanger: Int, val access: Int, val x: Int, val y: Int)
 
     val floorList = mutableListOf<IndoorFloor>()
     val placeList = mutableListOf<PlaceNode>()
     val crossList = mutableListOf<CrossNode>()
+    val dangerList = mutableListOf<DangerNode>()
 
     fun getFloorsIndoor(): List<IndoorFloor> {
         val db = readableDatabase
@@ -180,6 +182,28 @@ class DataBaseHelper(private val context: Context) :
         return crossList
     }
 
+    fun getNodesDanger(): List<DangerNode> {
+        val db = readableDatabase
+        val floorsIndoorCursor = db.rawQuery("SELECT * FROM nodes_danger", null)
+
+        floorsIndoorCursor?.let {
+            while (it.moveToNext()) {
+                val placeid = it.getInt(0)
+                val floorid = it.getInt(1)
+                val checkdanger = it.getInt(2)
+                val access = it.getInt(3)
+                val x = it.getInt(4)
+                val y = it.getInt(5)
+
+                dangerList.add(DangerNode(placeid, floorid, checkdanger, access, x, y))
+            }
+
+            it.close()
+        }
+
+        return dangerList
+    }
+
     fun findIdxtoFloor(floorid: Int, list: List<IndoorFloor>): Int {
         for (i in list) {
             if (floorid == i.floorid) {
@@ -193,7 +217,7 @@ class DataBaseHelper(private val context: Context) :
     fun findPlacetoXY(x: Int, y: Int, list: List<PlaceNode>, floorid: Int): PlaceNode? {
         for (i in list) {
             if (i.id.toInt() / 100 == floorid) {
-                if ((i.x - 50 <= x && x <= i.x + 50) && (i.y - 50 <= y && y <= i.y + 50)) {
+                if ((i.x - 30 <= x && x <= i.x + 30) && (i.y - 30 <= y && y <= i.y + 30)) {
                     return i
                 }
             }
@@ -235,7 +259,7 @@ class DataBaseHelper(private val context: Context) :
     fun findCrosstoXY(x: Int, y: Int, list: List<CrossNode>, floorid: Int): CrossNode? {
         for (i in list) {
             if (i.id.toInt() / 100 == floorid) {
-                if ((i.x - 50 <= x && x <= i.x + 50) && (i.y - 50 <= y && y <= i.y + 50)) {
+                if ((i.x - 30 <= x && x <= i.x + 30) && (i.y - 30 <= y && y <= i.y + 30)) {
                     return i
                 }
             }
