@@ -550,22 +550,22 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
                     cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
-                    if (cross != null) {
-                        for (i in root) {
-                            if ((cross!!.id.toInt() % 100 > 70 && cross!!.id == i.first) || cross!!.id == startId || cross!!.id == endId) {
-                                showCross(cross, root)
-                            }
-                        }
-                    }
-                    else if (cross == null) {
-                        showCross(null, root)
-                    }
-//                    for(i in root){
-//                        if(i.first == cross?.id){
-//                            showCross(cross, root)
-//                            return true
+//                    if (cross != null) {
+//                        for (i in root) {
+//                            if ((cross!!.id.toInt() % 100 > 70 && cross!!.id == i.first) || cross!!.id == startId || cross!!.id == endId) {
+//                                showCross(cross, root)
+//                            }
 //                        }
 //                    }
+//                    else if (cross == null) {
+//                        showCross(null, root)
+//                    }
+                    for(i in root){
+                        if(i.first == cross?.id){
+                            showCross(cross, root)
+                            return true
+                        }
+                    }
                     return true
                 }
             }
@@ -972,11 +972,6 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         bottomSheetForwardBtn.setOnClickListener(){
             var next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
-
-            if (next_cross!!.id == endId) {
-                showCross(next_cross, root)
-            }
-
             while (next_cross!!.id % 100 <= 70 && crossIndex < root.size)
             {
                 crossIndex = crossIndex + 1
