@@ -335,6 +335,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             map.cleanOtherPin("icon")
 
+            addDanger(nodesDanger, floorid)
+
             startId = null
             endId = null
 
@@ -535,10 +537,21 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var y = pointt!!.y/ratio
 
                     id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace, floorid)
+
+                    var ppointt = map.pinTouchCheck(PointF(e.x, e.y))
+                    ppointt!!.x = ppointt.x / ratio
+                    ppointt.y = ppointt.y / ratio
+                    var pid = db.findPlacetoXY(ppointt.x.toInt(), ppointt.y.toInt(), nodesPlace, floorid)
+
                     if (id != null)
                     {
                         map.clearPin()
                         showInfo(id)
+                    }
+                    else if (pid != null)
+                    {
+                        map.clearPin()
+                        showInfo(pid)
                     }
                     else if(id == null){
                         showInfo(null)
@@ -550,22 +563,22 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
                     cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
-//                    if (cross != null) {
-//                        for (i in root) {
-//                            if ((cross!!.id.toInt() % 100 > 70 && cross!!.id == i.first) || cross!!.id == startId || cross!!.id == endId) {
-//                                showCross(cross, root)
-//                            }
-//                        }
-//                    }
-//                    else if (cross == null) {
-//                        showCross(null, root)
-//                    }
-                    for(i in root){
-                        if(i.first == cross?.id){
-                            showCross(cross, root)
-                            return true
+                    if (cross != null) {
+                        for (i in root) {
+                            if ((cross!!.id.toInt() % 100 > 70 && cross!!.id == i.first) || cross!!.id == startId || cross!!.id == endId) {
+                                showCross(cross, root)
+                            }
                         }
                     }
+                    else if (cross == null) {
+                        showCross(null, root)
+                    }
+//                    for(i in root){
+//                        if(i.first == cross?.id){
+//                            showCross(cross, root)
+//                            return true
+//                        }
+//                    }
                     return true
                 }
             }
@@ -839,7 +852,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     endId = ecid!!.id
 
                     handler.postDelayed({
-                        map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
+                        map.animateScaleAndCenter(1f,PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio))?.start()
 
                         map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
                         map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.greenpin)
@@ -972,59 +985,113 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         bottomSheetForwardBtn.setOnClickListener(){
             var next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
-            while (next_cross!!.id % 100 <= 70 && crossIndex < root.size)
-            {
-                crossIndex = crossIndex + 1
-                next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
-            }
 
-            if (next_cross != null) {
-                showCross(next_cross, root)
+            if (cross!!.id == endId) {
+                btn_elvt.performClick()
+
+                handler.postDelayed({
+                    showCross(db.findCrosstoID(startId, nodesCross), root)
+                }, 2000)
             }
-            else if (next_cross == null) {
-                showCross(null, root)
+            else {
+                while (next_cross!!.id % 100 <= 70 && crossIndex < root.size)
+                {
+                    if (next_cross!!.id == endId) {
+                        break
+                    }
+
+                    crossIndex = crossIndex + 1
+                    next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
+                }
+
+                if (next_cross != null) {
+                    showCross(next_cross, root)
+                }
+                else if (next_cross == null) {
+                    showCross(null, root)
+                }
             }
         }
         bottomSheetBackwardBtn.setOnClickListener() {
             var prev_cross = db.findCrosstoID(root[crossIndex-1].first, nodesCross)
-            while ((prev_cross!!.id % 100 <= 70) && (crossIndex > -1))
-            {
-                crossIndex = crossIndex - 1
-                prev_cross = db.findCrosstoID(root[crossIndex-1].first, nodesCross)
+
+            if (cross!!.id == startId) {
+                btn_back.performClick()
+
+                handler.postDelayed({
+                    showCross(db.findCrosstoID(endId, nodesCross), root)
+                }, 2000)
             }
-            if (prev_cross != null) {
-                showCross(prev_cross, root)
-            }
-            else if (prev_cross == null) {
-                showCross(null, root)
-            }
-        }
-        if (cross != null) {
-            for (index in root.indices) {
-                var i = root[index]
-                if (cross.id == i.first) {
-                    crossIndex = index
-                    // 정보 사진
-                    var check = choiceArrow(i.second, i.third)
-                    if (i.second == "east") {
-                        bsImage.setImageBitmap(cross.imgEast)
-                        bsText.setText(cross.name + "에서 " + check.second)
-                    } else if (i.second == "west") {
-                        bsImage.setImageBitmap(cross.imgWest)
-                        bsText.setText(cross.name + "에서 " + check.second)
-                    } else if (i.second == "south") {
-                        bsImage.setImageBitmap(cross.imgSouth)
-                        bsText.setText(cross.name + "에서 " + check.second)
-                    } else if (i.second == "north") {
-                        bsImage.setImageBitmap(cross.imgNorth)
-                        bsText.setText(cross.name + "에서 " + check.second)
+            else {
+                while ((prev_cross!!.id % 100 <= 70) && (crossIndex > -1))
+                {
+                    if (prev_cross!!.id == startId) {
+                        break
                     }
 
+                    crossIndex = crossIndex - 1
+                    prev_cross = db.findCrosstoID(root[crossIndex-1].first, nodesCross)
+                }
+                if (prev_cross != null) {
+                    showCross(prev_cross, root)
+                }
+                else if (prev_cross == null) {
+                    showCross(null, root)
+                }
+            }
+        }
+        var elvt = 0
 
+        if (cross != null) {
+            if (cross.id == root[0].first) {
+                bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                bsText.setText("현재위치에서 출발")
+                bsArrow.setImageResource(0)
+                crossIndex = 0
+            }
+            else if (cross.id == root[root.size - 1].first) {
+                bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                bsText.setText("목적지 도착")
+                bsArrow.setImageResource(0)
+                crossIndex = root.size - 1
+            }
+            else {
+                for (index in root.indices) {
+                    var i = root[index]
+                    if (cross.id == i.first) {
+                        crossIndex = index
+                        // 정보 사진
+                        var check = choiceArrow(i.second, i.third)
 
-                    bsArrow.setImageResource(check.first)
+                        if (i.second == "east") {
+                            bsImage.setImageBitmap(cross.imgEast)
+                            bsText.setText(cross.name + "에서 " + check.second)
+                        } else if (i.second == "west") {
+                            bsImage.setImageBitmap(cross.imgWest)
+                            bsText.setText(cross.name + "에서 " + check.second)
+                        } else if (i.second == "south") {
+                            bsImage.setImageBitmap(cross.imgSouth)
+                            bsText.setText(cross.name + "에서 " + check.second)
+                        } else if (i.second == "north") {
+                            bsImage.setImageBitmap(cross.imgNorth)
+                            bsText.setText(cross.name + "에서 " + check.second)
+                        }
 
-                    break
+                        bsArrow.setImageResource(check.first)
+
+                        break
+                    }
+                }
+
+                if (cross.id == startId) {
+                    bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                    bsText.setText("엘리베이터 하차")
+                    bsArrow.setImageResource(0)
+                }
+                else if (cross.id == endId) {
+                    bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                    bsText.setText("엘리베이터 탑승")
+                    bsArrow.setImageResource(0)
                 }
             }
         }
@@ -1032,20 +1099,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         map.animateScaleAndCenter(1f,PointF(cross.x.toFloat()*ratio, cross.y.toFloat()*ratio))?.start()
 
-        var first_cross : Int = 10000000
-        var last_cross : Int = -1
-        root.forEachIndexed { index, triple ->
-            if ((triple.first % 100 > 70) && (index < first_cross))
-            { first_cross = index }
-            if ((triple.first % 100 > 70))
-            { last_cross = index }
-        }
-        if (crossIndex >= last_cross)
+        if (crossIndex == root.size - 1)
         {bottomSheetForwardBtn.visibility = View.GONE}
         else if (bottomSheetForwardBtn.visibility == View.GONE) {
             bottomSheetForwardBtn.visibility = View.VISIBLE
         }
-        if (crossIndex <= first_cross)
+        if (crossIndex == 0)
         {bottomSheetBackwardBtn.visibility = View.GONE}
         else if (bottomSheetBackwardBtn.visibility == View.GONE){
             bottomSheetBackwardBtn.visibility = View.VISIBLE
