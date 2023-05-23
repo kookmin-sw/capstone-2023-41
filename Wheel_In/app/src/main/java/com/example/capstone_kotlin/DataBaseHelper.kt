@@ -60,8 +60,8 @@ class DataBaseHelper(private val context: Context) :
 
     data class PlaceNode(val placeid: Int, val id: Double, val name: String, val nickname: String, val checkplace: Int,
                          val x: Int, val y: Int, val access: Int, val img1: Bitmap?, val img2: Bitmap?)
-    data class CrossNode(val placeid: Int, val id: Double, val x: Int, val y: Int, val name: String?, val nodes: List<Triple<Double, Int, String>>,
-                         val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
+    data class CrossNode(val placeid: Int, val id: Double, val x: Int, val y: Int, val name: String?, val access: Int,
+                         val nodes: List<Triple<Double, Int, String>>, val imgEast: Bitmap?, val imgWest: Bitmap?, val imgSouth: Bitmap?, val imgNorth: Bitmap?)
     data class DangerNode(val placeid: Int, val floorid: Int, val checkdanger: Int, val access: Int, val x: Int, val y: Int)
 
     val floorList = mutableListOf<IndoorFloor>()
@@ -139,12 +139,13 @@ class DataBaseHelper(private val context: Context) :
                 val x = it.getInt(2)
                 val y = it.getInt(3)
                 val name = it.getString(4)
-                val nodeList = it.getString(5)
+                val access = it.getInt(5)
+                val nodeList = it.getString(6)
 
-                val bytesEast: ByteArray? = it.getBlob(6)
-                val bytesWest: ByteArray? = it.getBlob(7)
-                val bytesSouth: ByteArray? = it.getBlob(8)
-                val bytesNorth: ByteArray? = it.getBlob(9)
+                val bytesEast: ByteArray? = it.getBlob(7)
+                val bytesWest: ByteArray? = it.getBlob(8)
+                val bytesSouth: ByteArray? = it.getBlob(9)
+                val bytesNorth: ByteArray? = it.getBlob(10)
 
                 val nodes = nodeList.split(",")
                     .map { tripleString ->
@@ -173,7 +174,7 @@ class DataBaseHelper(private val context: Context) :
                     imgNorth = BitmapFactory.decodeByteArray(bytesNorth, 0, bytesNorth.size)
                 }
 
-                crossList.add(CrossNode(placeid, id, x, y, name, nodes, imgEast, imgWest, imgSouth, imgNorth))
+                crossList.add(CrossNode(placeid, id, x, y, name, access, nodes, imgEast, imgWest, imgSouth, imgNorth))
             }
 
             it.close()

@@ -215,43 +215,43 @@ class PinView @JvmOverloads constructor(context: Context?, attr: AttributeSet? =
         }
     }
 
-    fun pinTouchCheck(point: PointF) : PointF
-    {
-        var result = PointF(-0.1f, -0.1f)
-        var s = scale
-        val density = resources.displayMetrics.densityDpi.toFloat()
-
-        for (i in pinArray)
-        {
-            var pinpoint = PointF(i.point.x, i.point.y)
-            pinpoint = sourceToViewCoord(pinpoint)!!
-            var touchpoint = (point)!!
-
-            var image = BitmapFactory.decodeResource(this.resources, i.imageId)
-
-            w = density / 420f * image!!.getWidth()
-            h = density / 420f * image!!.getHeight()
-
-            if(i.fixed == 1) // 확대 축소에 따라 크기가 변하지 않음
-            {
-                image = Bitmap.createScaledBitmap(image!!, (w!!).toInt(), (h!!).toInt(), true)
-            }
-            else // 확대 축소에 따라 크기가 변함
-            {
-                image= Bitmap.createScaledBitmap(image!!, (w!!*s).toInt(), (h!!*s).toInt(), true)
-            }
-            val sX = pinpoint.x - image!!.width / i.width //(/2가 없는 경우 해당 vPin좌표기준 좌측 상단으로 이미지가 생성됨)
-            val sY = pinpoint.y - image!!.height / i.height // width와 height를 빼는 부분이 없다면 vPin좌표기준 우측 하단
-            val eX = pinpoint.x + image!!.width
-            val eY = pinpoint.y + image!!.height
-
-            if((touchpoint.x >= sX) && (touchpoint.x <= eX) && (touchpoint.y >= sY) && (touchpoint.y <= eY))
-            {
-                result = i.point
-            }
-        }
-        return result
-    }
+//    fun pinTouchCheck(point: PointF) : PointF
+//    {
+//        var result = PointF(-0.1f, -0.1f)
+//        var s = scale
+//        val density = resources.displayMetrics.densityDpi.toFloat()
+//
+//        for (i in pinArray)
+//        {
+//            var pinpoint = PointF(i.point.x, i.point.y)
+//            pinpoint = sourceToViewCoord(pinpoint)!!
+//            var touchpoint = (point)!!
+//
+//            var image = BitmapFactory.decodeResource(this.resources, i.imageId)
+//
+//            w = density / 420f * image!!.getWidth()
+//            h = density / 420f * image!!.getHeight()
+//
+//            if(i.fixed == 1) // 확대 축소에 따라 크기가 변하지 않음
+//            {
+//                image = Bitmap.createScaledBitmap(image!!, (w!!).toInt(), (h!!).toInt(), true)
+//            }
+//            else // 확대 축소에 따라 크기가 변함
+//            {
+//                image= Bitmap.createScaledBitmap(image!!, (w!!*s).toInt(), (h!!*s).toInt(), true)
+//            }
+//            val sX = pinpoint.x - image!!.width / i.width //(/2가 없는 경우 해당 vPin좌표기준 좌측 상단으로 이미지가 생성됨)
+//            val sY = pinpoint.y - image!!.height / i.height // width와 height를 빼는 부분이 없다면 vPin좌표기준 우측 하단
+//            val eX = pinpoint.x + image!!.width
+//            val eY = pinpoint.y + image!!.height
+//
+//            if((touchpoint.x >= sX) && (touchpoint.x <= eX) && (touchpoint.y >= sY) && (touchpoint.y <= eY))
+//            {
+//                result = i.point
+//            }
+//        }
+//        return result
+//    }
 
     init {initialise()}
 }

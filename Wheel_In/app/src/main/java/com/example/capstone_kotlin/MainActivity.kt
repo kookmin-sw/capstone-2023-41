@@ -133,6 +133,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 취소 버튼
         cancel = findViewById(R.id.cancel)
+        cancel.setBackgroundColor(Color.parseColor("#1188ff"))
+
         // 두번째 서치뷰와 취소 버튼 레이아웃
         svAndCancel = findViewById(R.id.svAndCancel)
         // 자동완성
@@ -152,17 +154,20 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 출발, 도착 버튼
         var start = findViewById<Button>(R.id.start)
+        start.setBackgroundColor(Color.parseColor("#1188ff"))
+
         var end = findViewById<Button>(R.id.end)
+        end.setBackgroundColor(Color.parseColor("#1188ff"))
 
 
 
         // QR 촬영 버튼
         var qrButton: Button = findViewById(R.id.qrButton)
+        qrButton.setBackgroundColor(Color.parseColor("#1188ff"))
 
 
         // 층 수 스피너
         spinner = findViewById(R.id.spinner)
-
 
 
         // 지도 크기 제한
@@ -354,10 +359,15 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 화장실 검색 버튼
         var toiletButton: Button = findViewById(R.id.btn_toilet)
+        toiletButton.setBackgroundColor(Color.parseColor("#1188ff"))
+
         // 출입문 검색 버튼
         var enterButton: Button = findViewById(R.id.btn_enter)
+        enterButton.setBackgroundColor(Color.parseColor("#1188ff"))
+
         // 엘레베이터
         var elevatorButton: Button = findViewById(R.id.btn_elevator)
+        elevatorButton.setBackgroundColor(Color.parseColor("#1188ff"))
 
         // 층수 값 n = 400~499
         // 화장실 찾기 버튼 활성화. //1
@@ -365,9 +375,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map.clearPin()
             for (i in nodesPlace)
             {
-                if(i.checkplace == 1 && i.id.toInt() / 100 == floorid)
+                if (i.checkplace == 1 && i.id.toInt() / 100 == floorid)
                 {
-                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.bluepin)
+                    if (i.access == 0) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_1_0)
+                    }
+                    else if (i.access == 1) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_1_1)
+                    }
+                    else if (i.access == 2) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_1_2)
+                    }
                 }
             }
         }
@@ -376,9 +394,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map.clearPin()
             for (i in nodesPlace)
             {
-                if(i.checkplace == 2 && i.id.toInt() / 100 == floorid)
+                if (i.checkplace == 2 && i.id.toInt() / 100 == floorid)
                 {
-                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.bluepin)
+                    if (i.access == 0) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_2_0)
+                    }
+                    else if (i.access == 1) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_2_1)
+                    }
+                    else if (i.access == 2) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_2_2)
+                    }
                 }
             }
         }
@@ -387,9 +413,17 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             map.clearPin()
             for (i in nodesPlace)
             {
-                if(i.checkplace == 3 && i.id.toInt() / 100 == floorid)
+                if (i.checkplace == 3 && i.id.toInt() / 100 == floorid)
                 {
-                    map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.bluepin)
+                    if (i.access == 0) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_3_0)
+                    }
+                    else if (i.access == 1) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_3_1)
+                    }
+                    else if (i.access == 2) {
+                        map.addPin(PointF(i.x.toFloat()*ratio, i.y.toFloat()*ratio), 1, R.drawable.pin_3_2)
+                    }
                 }
             }
         }
@@ -421,7 +455,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             startId = id?.id
             map.clearStartPin()
             map.clearPin()
-            map.addStartPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.bluepin)
+            map.addStartPin((PointF(id!!.x.toFloat()*ratio, id!!.y.toFloat()*ratio)),1, R.drawable.startpin)
             mapInit()
             info.visibility = View.GONE
         }
@@ -438,7 +472,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             searchView2.setQuery(id?.name, false)
             map.clearPin()
             map.clearEndPin()
-            map.addEndPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.greenpin)
+            map.addEndPin((PointF(id!!.x.toFloat()*ratio!!, id!!.y.toFloat()*ratio!!)),1, R.drawable.finishpin)
             endId = id?.id
             mapInit()
             info.visibility = View.GONE
@@ -447,7 +481,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 확대 축소 버튼
         val plus: Button = findViewById(R.id.plus)
+        plus.setBackgroundColor(Color.parseColor("#1188ff"))
+
         val minus: Button = findViewById(R.id.minus)
+        minus.setBackgroundColor(Color.parseColor("#1188ff"))
 
 
         plus.setOnClickListener{
@@ -472,6 +509,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         // 비상 연락망 변수 추가
         val btn_emergency: Button = findViewById(R.id.btn_emergency)
+        btn_emergency.setBackgroundColor(Color.parseColor("#1188ff"))
+
         btn_emergency.setOnClickListener {
             showEmergencyPopup()
         }
@@ -538,20 +577,30 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                     id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace, floorid)
 
-                    var ppointt = map.pinTouchCheck(PointF(e.x, e.y))
-                    ppointt!!.x = ppointt.x / ratio
-                    ppointt.y = ppointt.y / ratio
-                    var pid = db.findPlacetoXY(ppointt.x.toInt(), ppointt.y.toInt(), nodesPlace, floorid)
+//                    var ppointt = map.pinTouchCheck(PointF(e.x, e.y))
+//                    ppointt!!.x = ppointt.x / ratio
+//                    ppointt.y = ppointt.y / ratio
+//                    var pid = db.findPlacetoXY(ppointt.x.toInt(), ppointt.y.toInt(), nodesPlace, floorid)
+//
+//                    if (id != null)
+//                    {
+//                        map.clearPin()
+//                        showInfo(id)
+//                    }
+//                    else if (pid != null)
+//                    {
+//                        map.clearPin()
+//                        showInfo(pid)
+//                    }
+//                    else if(id == null){
+//                        showInfo(null)
+//                    }
+//                    return true
 
                     if (id != null)
                     {
                         map.clearPin()
                         showInfo(id)
-                    }
-                    else if (pid != null)
-                    {
-                        map.clearPin()
-                        showInfo(pid)
                     }
                     else if(id == null){
                         showInfo(null)
@@ -718,7 +767,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         detail = findViewById(R.id.detail)
 
         btn_back = findViewById(R.id.btn_back)
+        btn_back.setBackgroundColor(Color.parseColor("#1188ff"))
+
         btn_elvt = findViewById(R.id.btn_elvt)
+        btn_elvt.setBackgroundColor(Color.parseColor("#1188ff"))
 
         var scid = db.findCrosstoID(startId, nodesCross)
         var ecid = db.findCrosstoID(endId, nodesCross)
@@ -766,8 +818,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             if (checklist.size == 1) {
                 map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
 
-                map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
-                map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.greenpin)
+                map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.startpin)
+                map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.finishpin)
 
                 makeLine(root)
             }
@@ -787,8 +839,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 handler.postDelayed({
                     map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
 
-                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
-                    map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.greenpin)
+                    map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.startpin)
+                    map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.elvtpin)
 
                     makeLine(rootsub)
                 }, 1000)
@@ -816,8 +868,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     handler.postDelayed({
                         map.animateScaleAndCenter(1f,PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio))?.start()
 
-                        map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
-                        map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.greenpin)
+                        map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.elvtpin)
+
+                        if (endId == root[root.size - 1].first) {
+                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.finishpin)
+                        }
+                        else {
+                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.elvtpin)
+                        }
 
                         makeLine(rootsub)
                     }, 1000)
@@ -854,8 +912,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     handler.postDelayed({
                         map.animateScaleAndCenter(1f,PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio))?.start()
 
-                        map.addPin(PointF(scid!!.x.toFloat()*ratio, scid!!.y.toFloat()*ratio), 1, R.drawable.bluepin)
-                        map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.greenpin)
+                        if (startId == root[0].first) {
+                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.startpin)
+                        }
+                        else {
+                            map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.elvtpin)
+                        }
+
+                        map.addPin(PointF(ecid!!.x.toFloat()*ratio, ecid!!.y.toFloat()*ratio), 1, R.drawable.elvtpin)
 
                         makeLine(rootsub)
                     }, 1000)
@@ -905,7 +969,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
     // 비상 연락처 호출 함수
     private fun showEmergencyPopup() {
-        val contactNumber = "02-0000-000"
+        val contactNumber = "02-910-4114"
 
         val inflater = layoutInflater
         val popupView = inflater.inflate(R.layout.emergency_popup, null)
@@ -964,7 +1028,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             info.visibility = View.VISIBLE
 
             map.animateScaleAndCenter(1f,PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio))?.start()
-            map.addPin(PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio), 1, R.drawable.bluepin)
+            map.addPin(PointF(id.x.toFloat()*ratio, id.y.toFloat()*ratio), 1, R.drawable.pin)
 
             return
         }
@@ -981,7 +1045,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         var bsArrow : ImageView = bottomSheetView.findViewById(R.id.bsArrowImage)
         var crossIndex = -1
         bottomSheetForwardBtn = bottomSheetView.findViewById(R.id.bs_btn_forward)
+        bottomSheetForwardBtn.setBackgroundColor(Color.parseColor("#1188ff"))
+
         bottomSheetBackwardBtn = bottomSheetView.findViewById(R.id.bs_btn_backward)
+        bottomSheetBackwardBtn.setBackgroundColor(Color.parseColor("#1188ff"))
 
         bottomSheetForwardBtn.setOnClickListener(){
             var next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
@@ -1167,24 +1234,37 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     }
 
     fun makeLine(root: List<Triple<Double, String, String>>) {
-        for (i in root)
+        for (index in root.indices)
         {
-            var pointt = db.findCrosstoID(i.first, nodesCross!!)
+            val element = root[index]
+
+            var pointt = db.findCrosstoID(element.first, nodesCross!!)
             var tempX = pointt!!.x.toFloat()*ratio
             var tempY = pointt!!.y.toFloat()*ratio
-            map.addLine(PointF(tempX, tempY), Color.GREEN)
 
-            if ((i.first % 100) > 70) {
-                if (i.third == "east") {
+            if (index != root.size - 1) {
+                if (db.findCrosstoID(root[index].first, nodesCross)!!.access == 1 && db.findCrosstoID(root[index + 1].first, nodesCross)!!.access == 1) {
+                    map.addLine(PointF(tempX, tempY), Color.YELLOW)
+                }
+                else {
+                    map.addLine(PointF(tempX, tempY), Color.GREEN)
+                }
+            }
+            else {
+                map.addLine(PointF(tempX, tempY), Color.GREEN)
+            }
+
+            if ((element.first % 100) > 70) {
+                if (element.third == "east") {
                     map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.east_arrow,2.0f, 2.0f)
                 }
-                else if (i.third == "west") {
+                else if (element.third == "west") {
                     map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.west_arrow, 2.0f, 2.0f)
                 }
-                else if (i.third == "south") {
+                else if (element.third == "south") {
                     map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.south_arrow, 2.0f, 2.0f)
                 }
-                else if (i.third == "north") {
+                else if (element.third == "north") {
                     map.addPin("arrow", PointF(tempX, tempY), 1, R.drawable.north_arrow, 2.0f, 2.0f)
                 }
             }
