@@ -23,7 +23,7 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 2. 주요 기능
 
-추가 예정
+<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="2000" />
 
 ## 3. 시연 동영상
 
