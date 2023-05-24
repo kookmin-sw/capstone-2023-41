@@ -24,11 +24,23 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 2. 주요 기능
 
-<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="1400" />
+<img src="./docs/img/기능1.PNG" alt="주요 기능1" width="1400" />
+
+<img src="./docs/img/기능2.PNG" alt="주요 기능2" width="1400" />
+
+<img src="./docs/img/기능3.PNG" alt="주요 기능3" width="1400" />
+
+<img src="./docs/img/기능4.PNG" alt="주요 기능4" width="1400" />
+
+<img src="./docs/img/기능5.PNG" alt="주요 기능5" width="1400" />
+
+<img src="./docs/img/기능6.PNG" alt="주요 기능6" width="1400" />
 
 ## 3. 기대 효과
 
-<img src="./docs/img/기대효과.PNG" alt="기대 효과" width="1400" />
+<img src="./docs/img/효과1.PNG" alt="기대 효과1" width="1400" />
+
+<img src="./docs/img/효과2.PNG" alt="기대 효과2" width="1400" />
 
 ## 4. 시연 동영상
 
