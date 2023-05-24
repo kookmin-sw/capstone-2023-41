@@ -12,6 +12,14 @@
 이러한 문제 의식을 통해 이 프로젝트는 휠체어 사용자가 실내에 대한 정보를 미리 파악하고, 위험요소를 사전에 차단하여 안전하게 실내에서 길을 찾을 수 있도록 도와주는 어플을 기획하게 되었습니다.
 **QR코드를 통한 현재 위치 파악 서비스와 현재 위치에서 휠체어 사용자들이 목적지까지 보다 안전하게 도착할 수 있도록 길을 안내하는 내비게이션 서비스를 구현하고자 합니다. 또한 사용자의 니즈를 분석하여 휠체어 사용자들이 자주 이용하고, 이용하기 전 사전 정보가 필요한 시설들에 대한 정보를 제공하는 서비스 또한 구현하고자 합니다.**
 
+### Abstract
+
+Wheelchair users have limited access. Also, the facilities available to wheelchair users are limited.
+Fortunately, today's outdoor map apps and navigation apps can check specific information about the road in advance through street views.
+However, today's indoor map apps and navigation apps do not provide information such as hills, jaws, and the width of roads as well as indoor photos.
+In the end, wheelchair users will not know in advance what risks exist in indoor places unless they have experienced themselves.
+This awareness of the problem led the project to plan an application that helps wheelchair users find their way indoors safely by grasping indoor information in advance and blocking hazards in advance.
+** We want to implement a current location service through QR code and a navigation service that guides wheelchair users on their way to their destination more safely. We also want to implement a service that analyzes users' needs and provides information on facilities that are frequently used by wheelchair users and require prior information before using them.**
 
 ## 2. 주요 기능
 
