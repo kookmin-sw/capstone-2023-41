@@ -19,7 +19,7 @@ Fortunately, today's outdoor map apps and navigation apps can check specific inf
 However, today's indoor map apps and navigation apps do not provide information such as hills, jaws, and the width of roads as well as indoor photos.
 In the end, wheelchair users will not know in advance what risks exist in indoor places unless they have experienced themselves.
 This awareness of the problem led the project to plan an application that helps wheelchair users find their way indoors safely by grasping indoor information in advance and blocking hazards in advance.
-** We want to implement a current location service through QR code and a navigation service that guides wheelchair users on their way to their destination more safely. We also want to implement a service that analyzes users' needs and provides information on facilities that are frequently used by wheelchair users and require prior information before using them.**
+**We want to implement a current location service through QR code and a navigation service that guides wheelchair users on their way to their destination more safely. We also want to implement a service that analyzes users' needs and provides information on facilities that are frequently used by wheelchair users and require prior information before using them.**
 
 ## 2. 주요 기능
 
