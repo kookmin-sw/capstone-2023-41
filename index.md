@@ -58,9 +58,13 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 5. 소개 자료
 
-[중간발표자료](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C.pdf)
+[중간발표자료](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/41팀_중간발표자료_최종.pdf)
 
-[중간보고서](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B3%B4%EA%B3%A0%EC%84%9C.pdf)
+[중간보고서](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/41팀_중간보고서.pdf)
+
+[최종발표자료]()
+
+[수행결과보고서]()
 
 
 
