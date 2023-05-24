@@ -1,8 +1,9 @@
 # 캡스톤디자인 41팀 소개 페이지
 
+## 1. 프로젝트 소개
+
 <img src="./docs/img/Logo.PNG" alt="로고" width="400" />
 
-## 1. 프로젝트 소개
 ### 휠체어 사용자를 위한 실내 내비게이션
 
 휠체어 사용자들이 지나다닐 수 있는 길은 한정적입니다. 또한 휠체어 사용자들이 이용할 수 있는 시설 또한 한정적입니다.
@@ -23,18 +24,31 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 2. 주요 기능
 
-<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="2000" />
+<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="2800" />
 
-## 3. 시연 동영상
+## 3. 기대 효과
+
+<img src="./docs/img/기대효과.PNG" alt="기대 효과" width="2800" />
+
+## 4. 시연 동영상
 
 추가 예정
 
-## 4. 소개 자료
+## 5. 소개 자료
 
 [중간발표자료](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C.pdf)
 
 [중간보고서](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B3%B4%EA%B3%A0%EC%84%9C.pdf)
 
-## 5. 팀 소개
+## 6. 팀 소개
 
-추가 예정
+#### 송희용 (팀장) [@Gnoyh](https://github.com/Gnoyh)
+
+```
+Student ID: ****1634
+E-mail: aksenhs@kookmin.ac.kr
+Role: PM / Backend (sub)
+    • Product Manager
+    • DataBase 관리
+    • 길 안내 서비스 구현
+```
