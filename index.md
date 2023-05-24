@@ -44,7 +44,7 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 4. 시연 동영상
 
-[시연 영상]([https://youtu.be/esEHS3oNi9E](https://youtu.be/OKeUUpQoPHQ))
+[시연 영상](https://youtu.be/OKeUUpQoPHQ)
 
 ## 5. 소개 자료
 
