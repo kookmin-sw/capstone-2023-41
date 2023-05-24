@@ -24,15 +24,15 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 2. 주요 기능
 
-<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="2800" />
+<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="1400" />
 
 ## 3. 기대 효과
 
-<img src="./docs/img/기대효과.PNG" alt="기대 효과" width="2800" />
+<img src="./docs/img/기대효과.PNG" alt="기대 효과" width="1400" />
 
 ## 4. 시연 동영상
 
-추가 예정
+[시연 영상]([https://youtu.be/esEHS3oNi9E](https://youtu.be/OKeUUpQoPHQ))
 
 ## 5. 소개 자료
 
@@ -42,7 +42,7 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 6. 팀 소개
 
-#### 송희용 (팀장) [@Gnoyh](https://github.com/Gnoyh)
+#### 송희용 (팀장) [Gnoyh](https://github.com/Gnoyh)
 
 ```
 Student ID: ****1634
@@ -51,4 +51,37 @@ Role: PM / Backend (sub)
     • Product Manager
     • DataBase 관리
     • 길 안내 서비스 구현
+```
+
+#### 손민우 [Minwoo Son](https://github.com/MarkSon-42)
+
+```
+Student ID: ****2833
+E-mail: systema5811@kookmin.ac.kr
+Role: Fronted / PM (sub)
+    • UI 제작
+    • 비상 연락 및 세부기능 구현
+    • VCS, 협업 관리
+```
+
+#### 신근철 [Shin](https://github.com/maecher)
+
+```
+Student ID: ****3119
+E-mail: aia7520@kookmin.ac.kr
+Role: Backend / Frontend (sub)
+    • 지도 뷰 구현
+    • 건물 약도 제작
+    • 지도 위에 경로 및 마커 구현
+```
+
+#### 안성준 [anseongjun](https://github.com/anseongjun)
+
+```
+Student ID: ****1642
+E-mail: dkstjdwns@kookmin.ac.kr
+Role: Backend / Frontend (sub)
+    • 검색 및 자동완성 구현
+    • 위치 정보창 구현
+    • UI 조정
 ```
