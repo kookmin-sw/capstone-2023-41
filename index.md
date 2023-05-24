@@ -41,4 +41,13 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 6. 팀 소개
 
-추가 예정
+#### 송희용 (팀장) [@Gnoyh](https://github.com/Gnoyh)
+
+```
+Student ID: ****1634
+E-mail: aksenhs@kookmin.ac.kr
+Role: PM 및 DB
+    • 프로젝트 총괄
+    • DB 관리
+    • 길안내 서비스 구현
+```
