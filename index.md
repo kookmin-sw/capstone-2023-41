@@ -47,8 +47,8 @@ This awareness of the problem led the project to plan an application that helps 
 ```
 Student ID: ****1634
 E-mail: aksenhs@kookmin.ac.kr
-Role: PM 및 DB
-    • 프로젝트 총괄
-    • DB 관리
-    • 길안내 서비스 구현
+Role: PM / Backend (sub)
+    • Product Manager
+    • DataBase 관리
+    • 길 안내 서비스 구현
 ```
