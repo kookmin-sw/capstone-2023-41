@@ -8,11 +8,10 @@ import android.graphics.BitmapFactory
 import java.io.FileOutputStream
 import java.io.IOException
 
-class DataBaseHelper(private val context: Context) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DataBaseHelper(private val context: Context, private val dbName: String) :
+    SQLiteOpenHelper(context, dbName, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_NAME = "Nodes.db"
         private const val DATABASE_VERSION = 1
     }
 
@@ -25,21 +24,21 @@ class DataBaseHelper(private val context: Context) :
     }
 
     private fun checkDatabase(): Boolean {
-        val dbFile = context.getDatabasePath(DATABASE_NAME)
+        val dbFile = context.getDatabasePath(dbName)
 
         return dbFile.exists()
     }
 
     private fun copyDatabase() {
         try {
-            val folder = context.getDatabasePath(DATABASE_NAME).parentFile
+            val folder = context.getDatabasePath(dbName).parentFile
 
             if (!folder.exists()) {
                 folder.mkdir()
             }
 
-            val inputStream = context.assets.open(DATABASE_NAME)
-            val outputStream = FileOutputStream(dbPath + DATABASE_NAME)
+            val inputStream = context.assets.open(dbName)
+            val outputStream = FileOutputStream(dbPath + dbName)
             val buffer = ByteArray(1024)
             var length: Int
 

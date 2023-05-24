@@ -67,7 +67,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
     private lateinit var gestureDetector: GestureDetector
 
     // DB
-    private lateinit var db: DataBaseHelper
+    private lateinit var db1: DataBaseHelper
+    private lateinit var db2: DataBaseHelper
 
     private lateinit var floorsIndoor: List<DataBaseHelper.IndoorFloor>
     private lateinit var nodesPlace: List<DataBaseHelper.PlaceNode>
@@ -112,11 +113,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         super.onCreate(savedInstanceState) // 부모 클래스의 onCreate 함수를 호출
 
         // DB
-        db = DataBaseHelper(this)
-        nodesPlace = db.getNodesPlace()
-        nodesCross = db.getNodesCross()
-        floorsIndoor = db.getFloorsIndoor()
-        nodesDanger = db.getNodesDanger()
+        db1 = DataBaseHelper(this, "Nodes1.db")
+        db2 = DataBaseHelper(this, "Nodes2.db")
+
+        nodesPlace = db2.getNodesPlace()
+        nodesCross = db1.getNodesCross()
+        floorsIndoor = db1.getFloorsIndoor()
+        nodesDanger = db2.getNodesDanger()
 
         setContentView(R.layout.activity_main)
 
@@ -217,7 +220,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 }
                 else if(newText.isNotEmpty()){
                     autoCom.visibility = View.VISIBLE
-                    if(newText == db.searchPlace2(newText, nodesPlace)?.name){
+                    if(newText == db2.searchPlace2(newText, nodesPlace)?.name){
                         autoCom.visibility = View.GONE
                     }
                 }
@@ -230,7 +233,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     setSearchLayout(View.GONE)
                 } else {
                     checkS1 = query
-                    id = db.searchPlace(query, nodesPlace)
+                    id = db2.searchPlace(query, nodesPlace)
                     if(id != null){
 
                         setSearchLayout(View.VISIBLE)
@@ -239,7 +242,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
 
                         floorid = id!!.id.toInt() / 100
-                        spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+                        spinner.setSelection(db1.findIdxtoFloor(floorid, floorsIndoor))
 
                         handler.postDelayed({
                             showInfo(id)
@@ -271,7 +274,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     autoCom2.visibility = View.VISIBLE
                     if(newText.isNotEmpty()){
                         autoCom2.visibility = View.VISIBLE
-                        if(newText == db.searchPlace2(newText, nodesPlace)?.name){
+                        if(newText == db2.searchPlace2(newText, nodesPlace)?.name){
                             autoCom2.visibility = View.GONE
                         }
                     }
@@ -284,14 +287,14 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
             override fun onQueryTextSubmit(query: String): Boolean {
                 checkS2 = query
-                id = db.searchPlace(query, nodesPlace)
+                id = db2.searchPlace(query, nodesPlace)
                 if(id != null){
                     // 키보드 없애기
                     val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     inputMethodManager.hideSoftInputFromWindow(searchView1.windowToken, 0)
 
                     floorid = id!!.id.toInt() / 100
-                    spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+                    spinner.setSelection(db1.findIdxtoFloor(floorid, floorsIndoor))
 
                     handler.postDelayed({
                         showInfo(id)
@@ -542,7 +545,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
 
                 var floorNum = selectedItem.substring(0,1).toInt()
-                drawableName = db.findMaptoFloor(floorNum, floorsIndoor)
+                drawableName = db1.findMaptoFloor(floorNum, floorsIndoor)
                 drawableId = resources.getIdentifier(drawableName, "drawable", packageName)
                 floorid = floorNum
                 map.setImage(ImageSource.resource(drawableId))
@@ -575,7 +578,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
 
-                    id = db.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace, floorid)
+                    id = db2.findPlacetoXY(x.toInt(), y.toInt(), nodesPlace, floorid)
 
 //                    var ppointt = map.pinTouchCheck(PointF(e.x, e.y))
 //                    ppointt!!.x = ppointt.x / ratio
@@ -611,7 +614,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     var pointt = map.viewToSourceCoord(e.x, e.y);
                     var x = pointt!!.x/ratio
                     var y = pointt!!.y/ratio
-                    cross = db.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
+                    cross = db1.findCrosstoXY(x.toInt(), y.toInt(), nodesCross, floorid)
                     if (cross != null) {
                         for (i in root) {
                             if ((cross!!.id.toInt() % 100 > 70 && cross!!.id == i.first) || cross!!.id == startId || cross!!.id == endId) {
@@ -772,8 +775,8 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         btn_elvt = findViewById(R.id.btn_elvt)
         btn_elvt.setBackgroundColor(Color.parseColor("#1188ff"))
 
-        var scid = db.findCrosstoID(startId, nodesCross)
-        var ecid = db.findCrosstoID(endId, nodesCross)
+        var scid = db1.findCrosstoID(startId, nodesCross)
+        var ecid = db1.findCrosstoID(endId, nodesCross)
 
         var checklist = mutableListOf<Int>()
 
@@ -828,10 +831,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                 rootsub = root.subList(checklist[checkidx], checklist[checkidx + 1]).toMutableList()
 
-                spinner.setSelection(db.findIdxtoFloor(startfloor, floorsIndoor))
+                spinner.setSelection(db1.findIdxtoFloor(startfloor, floorsIndoor))
 
-                scid = db.findCrosstoID(rootsub[0].first, nodesCross)
-                ecid = db.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
+                scid = db1.findCrosstoID(rootsub[0].first, nodesCross)
+                ecid = db1.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
 
                 startId = scid!!.id
                 endId = ecid!!.id
@@ -857,10 +860,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                         rootsub = root.subList(checklist[checkidx], checklist[checkidx + 1]).toMutableList()
                     }
 
-                    spinner.setSelection(db.findIdxtoFloor(rootsub[0].first.toInt() / 100, floorsIndoor))
+                    spinner.setSelection(db1.findIdxtoFloor(rootsub[0].first.toInt() / 100, floorsIndoor))
 
-                    scid = db.findCrosstoID(rootsub[0].first, nodesCross)
-                    ecid = db.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
+                    scid = db1.findCrosstoID(rootsub[0].first, nodesCross)
+                    ecid = db1.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
 
                     startId = scid!!.id
                     endId = ecid!!.id
@@ -901,10 +904,10 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
                     rootsub = root.subList(checklist[checkidx], checklist[checkidx + 1]).toMutableList()
 
-                    spinner.setSelection(db.findIdxtoFloor(rootsub[0].first.toInt() / 100, floorsIndoor))
+                    spinner.setSelection(db1.findIdxtoFloor(rootsub[0].first.toInt() / 100, floorsIndoor))
 
-                    scid = db.findCrosstoID(rootsub[0].first, nodesCross)
-                    ecid = db.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
+                    scid = db1.findCrosstoID(rootsub[0].first, nodesCross)
+                    ecid = db1.findCrosstoID(rootsub[rootsub.size - 1].first, nodesCross)
 
                     startId = scid!!.id
                     endId = ecid!!.id
@@ -955,9 +958,9 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             placeid = parts[0].toInt()
             floorid = parts[1].toDouble().toInt() / 100
 
-            spinner.setSelection(db.findIdxtoFloor(floorid, floorsIndoor))
+            spinner.setSelection(db1.findIdxtoFloor(floorid, floorsIndoor))
 
-            id = db.findPlacetoID(parts[1].toDouble(), nodesPlace)
+            id = db2.findPlacetoID(parts[1].toDouble(), nodesPlace)
 
             handler.postDelayed({
                 showInfo(id)
@@ -1051,13 +1054,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         bottomSheetBackwardBtn.setBackgroundColor(Color.parseColor("#1188ff"))
 
         bottomSheetForwardBtn.setOnClickListener(){
-            var next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
+            var next_cross = db1.findCrosstoID(root[crossIndex+1].first, nodesCross)
 
             if (cross!!.id == endId) {
                 btn_elvt.performClick()
 
                 handler.postDelayed({
-                    showCross(db.findCrosstoID(startId, nodesCross), root)
+                    showCross(db1.findCrosstoID(startId, nodesCross), root)
                 }, 2000)
             }
             else {
@@ -1068,7 +1071,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     }
 
                     crossIndex = crossIndex + 1
-                    next_cross = db.findCrosstoID(root[crossIndex+1].first, nodesCross)
+                    next_cross = db1.findCrosstoID(root[crossIndex+1].first, nodesCross)
                 }
 
                 if (next_cross != null) {
@@ -1080,13 +1083,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
             }
         }
         bottomSheetBackwardBtn.setOnClickListener() {
-            var prev_cross = db.findCrosstoID(root[crossIndex-1].first, nodesCross)
+            var prev_cross = db1.findCrosstoID(root[crossIndex-1].first, nodesCross)
 
             if (cross!!.id == startId) {
                 btn_back.performClick()
 
                 handler.postDelayed({
-                    showCross(db.findCrosstoID(endId, nodesCross), root)
+                    showCross(db1.findCrosstoID(endId, nodesCross), root)
                 }, 2000)
             }
             else {
@@ -1097,7 +1100,7 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                     }
 
                     crossIndex = crossIndex - 1
-                    prev_cross = db.findCrosstoID(root[crossIndex-1].first, nodesCross)
+                    prev_cross = db1.findCrosstoID(root[crossIndex-1].first, nodesCross)
                 }
                 if (prev_cross != null) {
                     showCross(prev_cross, root)
@@ -1111,13 +1114,13 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
 
         if (cross != null) {
             if (cross.id == root[0].first) {
-                bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                bsImage.setImageBitmap(db2.findPlacetoID(cross.id, nodesPlace)!!.img1)
                 bsText.setText("현재위치에서 출발")
                 bsArrow.setImageResource(0)
                 crossIndex = 0
             }
             else if (cross.id == root[root.size - 1].first) {
-                bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                bsImage.setImageBitmap(db2.findPlacetoID(cross.id, nodesPlace)!!.img1)
                 bsText.setText("목적지 도착")
                 bsArrow.setImageResource(0)
                 crossIndex = root.size - 1
@@ -1151,12 +1154,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
                 }
 
                 if (cross.id == startId) {
-                    bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                    bsImage.setImageBitmap(db2.findPlacetoID(cross.id, nodesPlace)!!.img1)
                     bsText.setText("엘리베이터 하차")
                     bsArrow.setImageResource(0)
                 }
                 else if (cross.id == endId) {
-                    bsImage.setImageBitmap(db.findPlacetoID(cross.id, nodesPlace)!!.img1)
+                    bsImage.setImageBitmap(db2.findPlacetoID(cross.id, nodesPlace)!!.img1)
                     bsText.setText("엘리베이터 탑승")
                     bsArrow.setImageResource(0)
                 }
@@ -1238,12 +1241,12 @@ class MainActivity : AppCompatActivity() {  // MainActivity정의, AppCompatActi
         {
             val element = root[index]
 
-            var pointt = db.findCrosstoID(element.first, nodesCross!!)
+            var pointt = db1.findCrosstoID(element.first, nodesCross!!)
             var tempX = pointt!!.x.toFloat()*ratio
             var tempY = pointt!!.y.toFloat()*ratio
 
             if (index != root.size - 1) {
-                if (db.findCrosstoID(root[index].first, nodesCross)!!.access == 1 && db.findCrosstoID(root[index + 1].first, nodesCross)!!.access == 1) {
+                if (db1.findCrosstoID(root[index].first, nodesCross)!!.access == 1 && db1.findCrosstoID(root[index + 1].first, nodesCross)!!.access == 1) {
                     map.addLine(PointF(tempX, tempY), Color.YELLOW)
                 }
                 else {
