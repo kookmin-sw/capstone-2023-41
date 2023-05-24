@@ -23,11 +23,11 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 2. 주요 기능
 
-<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="2000" />
+<img src="./docs/img/주요기능.PNG" alt="주요 기능" width="2800" />
 
 ## 3. 기대 효과
 
-<img src="./docs/img/기대효과.PNG" alt="기대 효과" width="2000" />
+<img src="./docs/img/기대효과.PNG" alt="기대 효과" width="2800" />
 
 ## 4. 시연 동영상
 
