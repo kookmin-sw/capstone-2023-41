@@ -62,9 +62,9 @@ This awareness of the problem led the project to plan an application that helps 
 
 [중간보고서](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/팀41_중간보고서.pdf)
 
-[최종발표자료]()
+[최종발표자료](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/팀41_최종발표자료.pdf)
 
-[수행결과보고서]()
+[수행결과보고서](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/팀41_수행결과보고서.pdf)
 
 
 
