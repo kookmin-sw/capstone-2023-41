@@ -54,7 +54,7 @@ This awareness of the problem led the project to plan an application that helps 
 
 ## 6. 팀 소개
 
-#### 송희용 (팀장) [Gnoyh](https://github.com/Gnoyh)
+#### 송희용(팀장): [Gnoyh](https://github.com/Gnoyh)
 
 ```
 Student ID: ****1634
@@ -65,7 +65,7 @@ Role: PM / Backend (sub)
     • 길 안내 서비스 구현
 ```
 
-#### 손민우 [Minwoo Son](https://github.com/MarkSon-42)
+#### 손민우: [Minwoo Son](https://github.com/MarkSon-42)
 
 ```
 Student ID: ****2833
@@ -76,7 +76,7 @@ Role: Fronted / PM (sub)
     • VCS, 협업 관리
 ```
 
-#### 신근철 [Shin](https://github.com/maecher)
+#### 신근철: [Shin](https://github.com/maecher)
 
 ```
 Student ID: ****3119
@@ -87,7 +87,7 @@ Role: Backend / Frontend (sub)
     • 지도 위에 경로 및 마커 구현
 ```
 
-#### 안성준 [anseongjun](https://github.com/anseongjun)
+#### 안성준: [anseongjun](https://github.com/anseongjun)
 
 ```
 Student ID: ****1642
