@@ -11,6 +11,7 @@
 하지만 지금의 실내 지도 앱, 내비게이션 앱들은 실내 사진 뿐만 아니라 언덕, 턱, 길의 너비등의 정보를 제공하지 않습니다.
 결국 휠체어 사용자들은 직접 겪어보지 않으면 실내 장소에 어떠한 위험요소가 존재하는지에 대해 미리 알 수 없다는 것입니다.
 이러한 문제 의식을 통해 이 프로젝트는 휠체어 사용자가 실내에 대한 정보를 미리 파악하고, 위험요소를 사전에 차단하여 안전하게 실내에서 길을 찾을 수 있도록 도와주는 어플을 기획하게 되었습니다.
+
 **QR코드를 통한 현재 위치 파악 서비스와 현재 위치에서 휠체어 사용자들이 목적지까지 보다 안전하게 도착할 수 있도록 길을 안내하는 내비게이션 서비스를 구현하고자 합니다. 또한 사용자의 니즈를 분석하여 휠체어 사용자들이 자주 이용하고, 이용하기 전 사전 정보가 필요한 시설들에 대한 정보를 제공하는 서비스 또한 구현하고자 합니다.**
 
 ### Abstract
@@ -20,7 +21,10 @@ Fortunately, today's outdoor map apps and navigation apps can check specific inf
 However, today's indoor map apps and navigation apps do not provide information such as hills, jaws, and the width of roads as well as indoor photos.
 In the end, wheelchair users will not know in advance what risks exist in indoor places unless they have experienced themselves.
 This awareness of the problem led the project to plan an application that helps wheelchair users find their way indoors safely by grasping indoor information in advance and blocking hazards in advance.
+
 **We want to implement a current location service through QR code and a navigation service that guides wheelchair users on their way to their destination more safely. We also want to implement a service that analyzes users' needs and provides information on facilities that are frequently used by wheelchair users and require prior information before using them.**
+
+
 
 ## 2. 주요 기능
 
@@ -36,21 +40,29 @@ This awareness of the problem led the project to plan an application that helps 
 
 <img src="./docs/img/기능6.PNG" alt="주요 기능6" width="1400" />
 
+
+
 ## 3. 기대 효과
 
 <img src="./docs/img/효과1.PNG" alt="기대 효과1" width="1400" />
 
 <img src="./docs/img/효과2.PNG" alt="기대 효과2" width="1400" />
 
+
+
 ## 4. 시연 동영상
 
 [시연 영상](https://youtu.be/OKeUUpQoPHQ)
+
+
 
 ## 5. 소개 자료
 
 [중간발표자료](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C.pdf)
 
 [중간보고서](https://github.com/kookmin-sw/capstone-2023-41/blob/main/docs/%ED%8C%8041_%EC%A4%91%EA%B0%84%EB%B3%B4%EA%B3%A0%EC%84%9C.pdf)
+
+
 
 ## 6. 팀 소개
 
